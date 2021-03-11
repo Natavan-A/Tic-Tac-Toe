@@ -13,13 +13,15 @@ class Connection:
                     'Content-Type' : 'application/x-www-form-urlencoded', 
                 }
 
+
     def __send_post_request(self, payload):
         response    = requests.post(self.__url, headers=self.__headers, data=payload)
         data        = response.json()
         return data, response
 
-    def __send_get_request(self, payload):
-        response    = requests.get(self.__url, headers=self.__headers, data=payload)
+
+    def __send_get_request(self, params):
+        response    = requests.get(self.__url + '?' + params, headers=self.__headers, data={})
         data        = response.json()
         return data, response
 
@@ -30,6 +32,16 @@ class Connection:
             'name': name
         }
         return self.__send_post_request(payload)
+
+
+    def add_a_member(self, teamId, userId):
+        payload = {
+            'type'  : 'member', 
+            'teamId': teamId,
+            'userId': userId
+        }
+        return self.__send_post_request(payload)
+
 
     def create_a_game(self, teamId1, teamId2, gameType='TTT', boardSize=12, target=6):
         payload = {
@@ -43,26 +55,31 @@ class Connection:
         return self.__send_post_request(payload)
 
 
-    def make_a_move(self, move, teamId, gameId):
-        payload = { 'type':'move', 'teamId':teamId, 'gameId':gameId, 'move':move }
+    def make_a_move(self, teamId, gameId, move):
+        payload = { 
+            'type'  : 'move', 
+            'teamId': teamId, 
+            'gameId': gameId, 
+            'move'  : move 
+        }
         return self.__send_post_request(payload)
 
 
-    def get_my_games(self, open=False):
-        payload = 'type=' + 'myOpenGames' if open else 'myGames'
-        return self.__send_get_request(payload)
+    def get_my_games(self, all=False):
+        params = 'type=' + 'myGames' if open else 'myOpenGames'
+        return self.__send_get_request(params)
 
-    def get_the_move_list(self, gameId, count):
-        payload = f'type=moves&gameId={gameId}&count={count}'
-        return self.__send_get_request(payload)
+
+    def get_the_move_list(self, gameId, count=1):
+        params = f'type=moves&gameId={gameId}&count={count}'
+        return self.__send_get_request(params)
 
 
     def get_board_string(self, gameId):
-        payload = f'type=boardString&gameId={gameId}'
+        params = f'type=boardString&gameId={gameId}'
+        return self.__send_get_request(params)
 
-        return self.__send_get_request(payload)
 
     def get_board_map(self, gameId):
-        payload = f'type=boardMap&gameId={gameId}'
-
-        return self.__send_get_request(payload)
+        params = f'type=boardMap&gameId={gameId}'
+        return self.__send_get_request(params)
