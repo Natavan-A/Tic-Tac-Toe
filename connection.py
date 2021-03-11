@@ -44,25 +44,28 @@ class Connection:
 
 
     def make_a_move(self, move, teamId, gameId):
-        payload = { 'type':'move', 'teamId':teamId, 'gameId':gameId, 'move':move }
+        payload = { 
+            'type'  : 'move', 
+            'teamId': teamId, 
+            'gameId': gameId, 
+            'move'  : move 
+        }
         return self.__send_post_request(payload)
 
 
-    def get_my_games(self, open=False):
-        payload = 'type=' + 'myOpenGames' if open else 'myGames'
+    def get_my_games(self, all=False):
+        payload = 'type=' + 'myGames' if open else 'myOpenGames'
         return self.__send_get_request(payload)
 
-    def get_the_move_list(self, gameId, count):
+    def get_the_move_list(self, gameId, count=1):
         payload = f'type=moves&gameId={gameId}&count={count}'
         return self.__send_get_request(payload)
 
 
     def get_board_string(self, gameId):
         payload = f'type=boardString&gameId={gameId}'
-
         return self.__send_get_request(payload)
 
     def get_board_map(self, gameId):
         payload = f'type=boardMap&gameId={gameId}'
-
         return self.__send_get_request(payload)
