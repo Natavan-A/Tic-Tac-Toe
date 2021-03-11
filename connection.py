@@ -39,7 +39,7 @@ class Connection:
             'gameType': gameType, 
             'boardSize': str(boardSize), 
             'target': str(target)
-            }
+        }
         return self.__send_post_request(payload)
 
 
