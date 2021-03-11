@@ -17,13 +17,11 @@ class Connection:
     def __send_post_request(self, payload):
         response    = requests.post(self.__url, headers=self.__headers, data=payload)
         data        = response.json()
-
         return response, data
 
     def __send_get_request(self, payload):
         response    = requests.get(self.__url, headers=self.__headers, data=payload)
         data        = response.json()
-
         return response, data
 
 
@@ -32,7 +30,6 @@ class Connection:
             'type': 'team', 
             'name': name
         }
-
         return self.__send_post_request(payload)
 
     def create_a_game(self, teamId1, teamId2, gameType='TTT', boardSize=12, target=6):
@@ -44,7 +41,6 @@ class Connection:
             'boardSize': str(boardSize), 
             'target': str(target)
             }
-
         return self.__send_post_request(payload)
 
 
@@ -59,7 +55,6 @@ class Connection:
 
     def get_the_move_list(self, gameId, count):
         payload = f'type=moves&gameId={gameId}&count={count}'
-
         return self.__send_get_request(payload)
 
 
