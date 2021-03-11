@@ -16,12 +16,12 @@ class Connection:
     def __send_post_request(self, payload):
         response    = requests.post(self.__url, headers=self.__headers, data=payload)
         data        = response.json()
-        return response, data
+        return data, response
 
     def __send_get_request(self, payload):
         response    = requests.get(self.__url, headers=self.__headers, data=payload)
         data        = response.json()
-        return response, data
+        return data, response
 
 
     def create_a_team(self, name):
@@ -33,12 +33,12 @@ class Connection:
 
     def create_a_game(self, teamId1, teamId2, gameType='TTT', boardSize=12, target=6):
         payload = {
-            'type': 'game', 
-            'teamId1': teamId1, 
-            'teamId2': teamId2, 
-            'gameType': gameType, 
+            'type'     : 'game', 
+            'teamId1'  : teamId1, 
+            'teamId2'  : teamId2, 
+            'gameType' : gameType, 
             'boardSize': str(boardSize), 
-            'target': str(target)
+            'target'   : str(target)
         }
         return self.__send_post_request(payload)
 
@@ -49,7 +49,7 @@ class Connection:
 
 
     def get_my_games(self, open=False):
-        payload = 'type=' +'myOpenGames' if open else 'myGames'
+        payload = 'type=' + 'myOpenGames' if open else 'myGames'
         return self.__send_get_request(payload)
 
     def get_the_move_list(self, gameId, count):

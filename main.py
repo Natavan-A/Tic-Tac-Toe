@@ -2,5 +2,5 @@ from connection import Connection
 
 if __name__ == "__main__":
     connection = Connection(api_key='c9426ee5181dca77e9a2', user_id='1055')
-    response, data = connection.create_a_team(name='hellos')
+    data, _ = connection.create_a_team(name='hellos')
     print(data['code'])
