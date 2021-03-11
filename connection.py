@@ -1,4 +1,5 @@
 import requests
+import json
 
 
 class Connection:
@@ -14,10 +15,16 @@ class Connection:
                 }
 
     def __send_post_request(self, payload):
-        return requests.post(self.__url, headers=self.__headers, data=payload)
+        response    = requests.post(self.__url, headers=self.__headers, data=payload)
+        data        = response.json()
+
+        return response, data
 
     def __send_get_request(self, payload):
-        return requests.get(self.__url, headers=self.__headers, data=payload)
+        response    = requests.get(self.__url, headers=self.__headers, data=payload)
+        data        = response.json()
+
+        return response, data
 
 
     def create_a_team(self, name):
@@ -63,5 +70,5 @@ class Connection:
 
     def get_board_map(self, gameId):
         payload = f'type=boardMap&gameId={gameId}'
-        
+
         return self.__send_get_request(payload)
