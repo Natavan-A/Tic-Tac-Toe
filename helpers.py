@@ -75,41 +75,50 @@ def is_terminal(player, board):
 		print("tie")
 		return 0
 
-	return full_board
+def ALPHA_BETA_SEARCH(player, board): # returns an action
+	alpha = float('-inf')
+	beta = float('inf')
 
-def ALPHA_BETA_SEARCH(state): # returns an action
-    pass
+	v = MAX_VALUE(player, board, alpha, beta)
+	print(v)
 
-def MINIMAX_SEARCH(player, board): # returns
+def MAX_VALUE(player, board, alpha, beta): # returns
 	print(board)
 	terminal = is_terminal(my_player(), board)
-	print(terminal)
-	if (terminal != False): return terminal
-    
-	if (player == 'X'): return MAX_VALUE(player, board)
-	elif (player == 'O'): return MIN_VALUE(player, board)
+	if (terminal is not None): return terminal
 
-def MAX_VALUE(player, board): # returns
 	v = float('-inf')
 	moves = get_moves(board) # game.moves
 
     # find maximum value
 	for move in moves:
 		board[move[0]][move[1]] = player
-		v = max(v, MINIMAX_SEARCH(switch_player(player), board))
+		v = max(v, MIN_VALUE(switch_player(player), board, alpha, beta))
 		board[move[0]][move[1]] = '-'
+		if v >= beta:
+			print("pruned")
+			return v
+		alpha = max(alpha, v)
 
 	return v
 
-def MIN_VALUE(player, board): # returns 
+def MIN_VALUE(player, board, alpha, beta): # returns
+	print(board)
+	terminal = is_terminal(my_player(), board)
+	if (terminal is not None): return terminal
+
 	v = float('inf')
 	moves = get_moves(board) # game.moves
 
     # find minimum value
 	for move in moves:
 		board[move[0]][move[1]] = player
-		v = min(v, MINIMAX_SEARCH(switch_player(player), board))
+		v = min(v, MAX_VALUE(switch_player(player), board, alpha, beta))
 		board[move[0]][move[1]] = '-'
+		if v <= alpha:
+			print("pruned")
+			return v
+		beta = min(beta, v)
 
 	return v
 
@@ -138,9 +147,9 @@ board = [['-','-','-'],
 board = [['X','O'],
 		['-','-']]
 
-board = [['X','O','O'],
-		['O','O','X'],
-		['X','X','O']]
+board = [['X','-','O'],
+		['O','O','-'],
+		['X','-','-']]
 # print(board)
 player = 'X'
-MINIMAX_SEARCH(player, board)
+ALPHA_BETA_SEARCH(player, board)
