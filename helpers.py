@@ -2,7 +2,21 @@ def switch_player(player):
 	if (player == 'X'): return 'O'
 	else: return 'X'
 
-def is_terminal(player):
+def my_player():
+	return this_player
+
+def get_moves(board):
+	empy_spots = [] # a list to store moves
+	n = len(board) 	# game.board
+
+	# for loops can be removed if board class exists!!!
+	for i in range(n):
+		for j in range(n):
+			if (board[i][j] == '-'): empy_spots.append((i,j))
+
+	return empy_spots
+
+def is_terminal(player, board):
 	n = len(board) 	# game.board
 	target = 3		# game.target
 	full_board = True
@@ -55,40 +69,70 @@ def is_terminal(player):
 					if (board[i][j] == player): return 1
 					else: return -1
 
+	# TIE
 	if (full_board and not win):
 		print("tie")
 		return 0
 
-def ALPHA_BETA_SEARCH(state): # returns an action
-    pass
+def ALPHA_BETA_SEARCH(player, board): # returns an action
+	alpha = float('-inf')
+	beta = float('inf')
+	v = float('-inf')
+	bestScore = float('-inf')
+	bestMove = None
+	moves = get_moves(board) # game.moves
 
-def MINIMAX_SEARCH(player, state): # returns 
-    #if (terminal) return utility
-    if (player == 'X'):
-    	return MAX_VALUE(player, state)
-    elif (player == 'O'):
-    	return MIN_VALUE(player, state)
+    # find best action
+	for move in moves:
+		board[move[0]][move[1]] = player
+		v = max(v, MIN_VALUE(switch_player(player), board, alpha, beta))
+		board[move[0]][move[1]] = '-'
+		if (v > bestScore):
+			bestScore = v
+			bestMove = move
 
+	print(bestScore)
+	print(bestMove)
 
-def MAX_VALUE(player, state): # returns 
-    v = float('-inf')
-    moves = game.moves
+def MAX_VALUE(player, board, alpha, beta): # returns
+	print(board)
+	terminal = is_terminal(my_player(), board)
+	if (terminal is not None): return terminal
+
+	v = float('-inf')
+	moves = get_moves(board) # game.moves
 
     # find maximum value
-    for move in moves:
-    	v = max(v, MINIMAX_SEARCH(switch_player(player), move))
+	for move in moves:
+		board[move[0]][move[1]] = player
+		v = max(v, MIN_VALUE(switch_player(player), board, alpha, beta))
+		board[move[0]][move[1]] = '-'
+		if v >= beta:
+			print("pruned")
+			return v
+		alpha = max(alpha, v)
 
-    return v
+	return v
 
-def MIN_VALUE(player, state): # returns 
-    v = float('inf')
-    moves = game.moves
+def MIN_VALUE(player, board, alpha, beta): # returns
+	print(board)
+	terminal = is_terminal(my_player(), board)
+	if (terminal is not None): return terminal
+
+	v = float('inf')
+	moves = get_moves(board) # game.moves
 
     # find minimum value
-    for move in moves:
-    	v = min(v, MINIMAX_SEARCH(switch_player(player), move))
+	for move in moves:
+		board[move[0]][move[1]] = player
+		v = min(v, MAX_VALUE(switch_player(player), board, alpha, beta))
+		board[move[0]][move[1]] = '-'
+		if v <= alpha:
+			print("pruned")
+			return v
+		beta = min(beta, v)
 
-    return v
+	return v
 
 # game part:::: will be removed
 board = [['-' for x in range(3)] for x in range(3)]
@@ -107,6 +151,21 @@ board = [['X','O','X'],
 board = [['O','O','X'],
 		['O','X','O'],
 		['X','O','X']]
+
+board = [['-','-','-'],
+		['-','-','-'],
+		['-','-','-']]
+
+board = [['X','O'],
+		['-','-']]
+
+board = [['X','-','O'],
+		['O','O','-'],
+		['X','-','-']]
+
+board = [['X','X','O'],
+		['O','O','X'],
+		['X','O','X']]
 # print(board)
-player = 'X'
-print(is_terminal(player))
+this_player = 'O'
+ALPHA_BETA_SEARCH(this_player, board)
