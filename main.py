@@ -1,4 +1,6 @@
 from connection import Connection
+from game import Game
+from team import Team
 
 if __name__ == "__main__":
     connection = Connection(api_key='c9426ee5181dca77e9a2', user_id='1055')
@@ -28,11 +30,21 @@ if __name__ == "__main__":
     # data, _ = connection.make_a_move(1256, 1474, "4,6")
     # print(data)
 
-    data, _ = connection.get_the_move_list(1474)
-    moves = data['moves'][0]
-    print(moves['teamId'])
+    # data, _ = connection.get_the_move_list(1474)
+    # moves = data['moves'][0]
+    # print(moves['teamId'])
 
 
+
+    game = Game()
+    game.set_api_connection(connection)
+    game.set_target(20)
+    game.set_board(12)
+    game.set_my_team(1248, 'X')
+    game.set_opponent_team(1256, 'O')
+
+    game.create()
+    # game.start_the_game()
     #isitend - teamId - 1248
     #helloss - teamId - 1256
     # 1248-1256 -> gameId - 1474

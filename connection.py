@@ -1,4 +1,6 @@
+from exceptions import *
 import requests
+import sys
 
 
 class Connection:
@@ -15,16 +17,10 @@ class Connection:
 
 
     def __send_post_request(self, payload):
-        response    = requests.post(self.__url, headers=self.__headers, data=payload)
-        data        = response.json()
-        return data, response
-
+        return requests.post(self.__url, headers=self.__headers, data=payload)
 
     def __send_get_request(self, params):
-        response    = requests.get(self.__url + '?' + params, headers=self.__headers, data={})
-        data        = response.json()
-        return data, response
-
+        return requests.get(self.__url + '?' + params, headers=self.__headers, data={})
 
     def create_a_team(self, name):
         payload = {
@@ -43,7 +39,7 @@ class Connection:
         return self.__send_post_request(payload)
 
 
-    def create_a_game(self, teamId1, teamId2, gameType='TTT', boardSize=12, target=6):
+    def create_a_game(self, teamId1, teamId2, gameType, boardSize, target):
         payload = {
             'type'     : 'game', 
             'teamId1'  : teamId1, 
@@ -83,3 +79,23 @@ class Connection:
     def get_board_map(self, gameId):
         params = f'type=boardMap&gameId={gameId}'
         return self.__send_get_request(params)
+
+    @staticmethod
+    def validate(response):
+        try:
+            if not response:
+                raise HTTPRequestFailureException
+
+            data = response.json()
+            if not data['code'] == 'OK': 
+                raise requests.HTTPError
+
+            if not data['code'] == 'OK':
+                raise APIFailureException
+            
+        except HTTPRequestFailureException:
+            print(f'Request has failed with {response.status_code} status code.')
+            sys.exit()
+        except APIFailureException:
+            print(f'Api returned {data["code"]} code' + f' with the below message\n{data["message"]}' if data["nessage"] else ".")
+            return False
