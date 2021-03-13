@@ -19,7 +19,7 @@ def get_moves(board):
 
 def is_terminal(player, board):
 	n = len(board) 	# game.board
-	target = 2		# game.target
+	target = 3		# game.target
 	full_board = True
 	win = False
 
@@ -63,7 +63,7 @@ def is_terminal(player, board):
 					if (i+target <= n):
 						if (board[i][j] != board[i+k][j+k]): break;
 					else:
-						if (board[i][j] != board[i-k][j+k]): break;
+						if (board[i][j] != board[i-k][j+k] or i-k < 0): break;
 					if (k == target - 1): win = True
 				if (win):
 					print("diagonal found")
@@ -135,8 +135,12 @@ board = [['-','-','-'],
 		['-','-','-'],
 		['-','-','-']]
 
-board = [['-','-'],
+board = [['X','O'],
 		['-','-']]
+
+board = [['X','O','O'],
+		['O','O','X'],
+		['X','X','O']]
 # print(board)
 player = 'X'
 MINIMAX_SEARCH(player, board)
