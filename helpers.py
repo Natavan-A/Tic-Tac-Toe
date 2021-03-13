@@ -2,6 +2,9 @@ def switch_player(player):
 	if (player == 'X'): return 'O'
 	else: return 'X'
 
+def my_player():
+	return 'X'
+
 
 def get_moves(board):
 	empy_spots = [] # a list to store moves
@@ -79,7 +82,7 @@ def ALPHA_BETA_SEARCH(state): # returns an action
 
 def MINIMAX_SEARCH(player, board): # returns
 	print(board)
-	terminal = is_terminal(switch_player(player), board)
+	terminal = is_terminal(my_player(), board)
 	print(terminal)
 	if (terminal != False): return terminal
     
