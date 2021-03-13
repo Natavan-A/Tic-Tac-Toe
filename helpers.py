@@ -3,8 +3,7 @@ def switch_player(player):
 	else: return 'X'
 
 def my_player():
-	return 'X'
-
+	return this_player
 
 def get_moves(board):
 	empy_spots = [] # a list to store moves
@@ -78,9 +77,22 @@ def is_terminal(player, board):
 def ALPHA_BETA_SEARCH(player, board): # returns an action
 	alpha = float('-inf')
 	beta = float('inf')
+	v = float('-inf')
+	bestScore = float('-inf')
+	bestMove = None
+	moves = get_moves(board) # game.moves
 
-	v = MAX_VALUE(player, board, alpha, beta)
-	print(v)
+    # find best action
+	for move in moves:
+		board[move[0]][move[1]] = player
+		v = max(v, MIN_VALUE(switch_player(player), board, alpha, beta))
+		board[move[0]][move[1]] = '-'
+		if (v > bestScore):
+			bestScore = v
+			bestMove = move
+
+	print(bestScore)
+	print(bestMove)
 
 def MAX_VALUE(player, board, alpha, beta): # returns
 	print(board)
@@ -150,6 +162,10 @@ board = [['X','O'],
 board = [['X','-','O'],
 		['O','O','-'],
 		['X','-','-']]
+
+board = [['X','X','O'],
+		['O','O','X'],
+		['X','O','X']]
 # print(board)
-player = 'X'
-ALPHA_BETA_SEARCH(player, board)
+this_player = 'O'
+ALPHA_BETA_SEARCH(this_player, board)
