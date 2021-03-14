@@ -47,7 +47,7 @@ def is_terminal(player, board):
 
 				# STARTING FROM THE NEXT POSITION
 				for k in range(j+1, target):
-					if (board[j][i] != board[j+k][i]): break;
+					if (board[j][i] != board[j+k][i]): break
 					if (k == target - 1): win = True
 				if (win):
 					#print("column found")
@@ -60,9 +60,9 @@ def is_terminal(player, board):
 			if (board[i][j] != '-' and j+target <= n):
 				for k in range(target):
 					if (i+target <= n):
-						if (board[i][j] != board[i+k][j+k]): break;
+						if (board[i][j] != board[i+k][j+k]): break
 					else:
-						if (board[i][j] != board[i-k][j+k] or i-k < 0): break;
+						if (board[i][j] != board[i-k][j+k]): break
 					if (k == target - 1): win = True
 				if (win):
 					#print("diagonal found")
