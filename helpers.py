@@ -32,7 +32,7 @@ def is_terminal(player, board):
 					if (board[i][j] != board[i][j+k]): break;
 					if (k == target - 1): win = True
 				if (win):
-					print("row found")
+					#print("row found")
 					if (board[i][j] == player): return 1
 					else: return -1
 			else:
@@ -50,7 +50,7 @@ def is_terminal(player, board):
 					if (board[j][i] != board[j+k][i]): break;
 					if (k == target - 1): win = True
 				if (win):
-					print("column found")
+					#print("column found")
 					if (board[j][i] == player): return 1
 					else: return -1
 
@@ -65,13 +65,13 @@ def is_terminal(player, board):
 						if (board[i][j] != board[i-k][j+k] or i-k < 0): break;
 					if (k == target - 1): win = True
 				if (win):
-					print("diagonal found")
+					#print("diagonal found")
 					if (board[i][j] == player): return 1
 					else: return -1
 
 	# TIE
 	if (full_board and not win):
-		print("tie")
+		#print("tie")
 		return 0
 
 def ALPHA_BETA_SEARCH(player, board): # returns an action
@@ -95,7 +95,7 @@ def ALPHA_BETA_SEARCH(player, board): # returns an action
 	print(bestMove)
 
 def MAX_VALUE(player, board, alpha, beta): # returns
-	print(board)
+	#print(board)
 	terminal = is_terminal(my_player(), board)
 	if (terminal is not None): return terminal
 
@@ -107,15 +107,13 @@ def MAX_VALUE(player, board, alpha, beta): # returns
 		board[move[0]][move[1]] = player
 		v = max(v, MIN_VALUE(switch_player(player), board, alpha, beta))
 		board[move[0]][move[1]] = '-'
-		if v >= beta:
-			print("pruned")
-			return v
+		if v >= beta: return v
 		alpha = max(alpha, v)
 
 	return v
 
 def MIN_VALUE(player, board, alpha, beta): # returns
-	print(board)
+	#print(board)
 	terminal = is_terminal(my_player(), board)
 	if (terminal is not None): return terminal
 
@@ -127,9 +125,7 @@ def MIN_VALUE(player, board, alpha, beta): # returns
 		board[move[0]][move[1]] = player
 		v = min(v, MAX_VALUE(switch_player(player), board, alpha, beta))
 		board[move[0]][move[1]] = '-'
-		if v <= alpha:
-			print("pruned")
-			return v
+		if v <= alpha: return v
 		beta = min(beta, v)
 
 	return v
@@ -159,13 +155,15 @@ board = [['-','-','-'],
 board = [['X','O'],
 		['-','-']]
 
-board = [['X','-','O'],
-		['O','O','-'],
+board = [['X','O','O'],
+		['O','O','X'],
 		['X','-','-']]
 
-board = [['X','X','O'],
-		['O','O','X'],
-		['X','O','X']]
-# print(board)
-this_player = 'O'
+# board = [['X','X','O'],
+# 		['O','O','X'],
+# 		['X','O','X']]
+
+#board = [['-' for x in range(4)] for x in range(4)]
+print(board)
+this_player = 'X'
 ALPHA_BETA_SEARCH(this_player, board)
