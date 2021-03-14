@@ -1,3 +1,5 @@
+terminal_states = []
+
 def switch_player(player):
 	if (player == 'X'): return 'O'
 	else: return 'X'
@@ -16,63 +18,59 @@ def get_moves(board):
 
 	return empy_spots
 
-def is_terminal(player, board):
-	n = len(board) 	# game.board
-	target = 3		# game.target
+def get_teminal_states(board_size, target):
+	row_states = []
+	column_states = []
+	diagonal_states = []
+
+	for i in range(board_size):
+		for j in range(board_size):
+
+			rows = []
+			columns = []
+			diagonals = []
+			diagonals2 = []
+			for k in range(target):
+				if (j+target <= board_size):
+					rows.append((i,j+k))
+					if (i+target <= board_size):
+						diagonals.append((i+k,j+k))
+					if (i-target+1 >= 0):
+						diagonals2.append((i-k,j+k))
+				if (i+target <= board_size):
+					columns.append((i+k,j))
+			if (len(rows) != 0): 
+				row_states.append(rows)
+				terminal_states.append(rows)
+			if (len(columns) != 0): 
+				column_states.append(columns)
+				terminal_states.append(columns)
+			if (len(diagonals) != 0): 
+				diagonal_states.append(diagonals)
+				terminal_states.append(diagonals)
+			if (len(diagonals2) != 0): 
+				diagonal_states.append(diagonals2)
+				terminal_states.append(diagonals2)
+
+def is_terminal(player):
 	full_board = True
-	win = False
+	sign = None
 
-	# ROW BASED WIN
-	for i in range(n):
-		for j in range(n):
-			if (board[i][j] != '-' and j+target <= n):
-
-				# STARTING FROM THE NEXT POSITION
-				for k in range(j+1, target):
-					if (board[i][j] != board[i][j+k]): break;
-					if (k == target - 1): win = True
-				if (win):
-					#print("row found")
-					if (board[i][j] == player): return 1
-					else: return -1
+	for state in terminal_states:
+		sign = None
+		for i in range(len(state)):
+			cell = board[state[i][0]][state[i][1]]
+			if(cell == '-'): full_board = False
+			if (sign is None):
+				sign = cell
+				continue
 			else:
-				# IF EMPTY SPOT DETECTED, THE BOARD IS NOT FULL
-				if (board[i][j] == '-'):
-					full_board = False
+				if (cell != sign): break
+				elif (i != len(state)-1): continue
 
-	# COLUMN BASED WIN
-	for i in range(n):
-		for j in range(n):
-			if (board[j][i] != '-' and j+target <= n):
+			return 1 if sign == player else -1
 
-				# STARTING FROM THE NEXT POSITION
-				for k in range(j+1, target):
-					if (board[j][i] != board[j+k][i]): break
-					if (k == target - 1): win = True
-				if (win):
-					#print("column found")
-					if (board[j][i] == player): return 1
-					else: return -1
-
-	# DIAGONAL BASED WIN
-	for i in range(n):
-		for j in range(n):
-			if (board[i][j] != '-' and j+target <= n):
-				for k in range(target):
-					if (i+target <= n):
-						if (board[i][j] != board[i+k][j+k]): break
-					else:
-						if (board[i][j] != board[i-k][j+k]): break
-					if (k == target - 1): win = True
-				if (win):
-					#print("diagonal found")
-					if (board[i][j] == player): return 1
-					else: return -1
-
-	# TIE
-	if (full_board and not win):
-		#print("tie")
-		return 0
+	if (full_board): return 0
 
 def ALPHA_BETA_SEARCH(player, board): # returns an action
 	alpha = float('-inf')
@@ -81,6 +79,7 @@ def ALPHA_BETA_SEARCH(player, board): # returns an action
 	bestScore = float('-inf')
 	bestMove = None
 	moves = get_moves(board) # game.moves
+	get_teminal_states(len(board), 3)
 
     # find best action
 	for move in moves:
@@ -91,12 +90,11 @@ def ALPHA_BETA_SEARCH(player, board): # returns an action
 			bestScore = v
 			bestMove = move
 
-	print(bestScore)
-	print(bestMove)
+	return bestMove
 
 def MAX_VALUE(player, board, alpha, beta): # returns
 	#print(board)
-	terminal = is_terminal(my_player(), board)
+	terminal = is_terminal(my_player())
 	if (terminal is not None): return terminal
 
 	v = float('-inf')
@@ -114,7 +112,7 @@ def MAX_VALUE(player, board, alpha, beta): # returns
 
 def MIN_VALUE(player, board, alpha, beta): # returns
 	#print(board)
-	terminal = is_terminal(my_player(), board)
+	terminal = is_terminal(my_player())
 	if (terminal is not None): return terminal
 
 	v = float('inf')
@@ -156,14 +154,14 @@ board = [['X','O'],
 		['-','-']]
 
 board = [['X','O','O'],
-		['O','O','X'],
+		['O','O','-'],
 		['X','-','-']]
 
 # board = [['X','X','O'],
 # 		['O','O','X'],
 # 		['X','O','X']]
 
-#board = [['-' for x in range(4)] for x in range(4)]
+board = [['-' for x in range(12)] for x in range(12)]
 print(board)
 this_player = 'X'
-ALPHA_BETA_SEARCH(this_player, board)
+print(ALPHA_BETA_SEARCH(this_player, board))
