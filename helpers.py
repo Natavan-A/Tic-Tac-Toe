@@ -1,4 +1,7 @@
 terminal_states = []
+row_states = []
+column_states = []
+diagonal_states = []
 
 def switch_player(player):
 	if (player == 'X'): return 'O'
@@ -19,17 +22,15 @@ def get_moves(board):
 	return empy_spots
 
 def get_teminal_states(board_size, target):
-	row_states = []
-	column_states = []
-	diagonal_states = []
-
 	for i in range(board_size):
 		for j in range(board_size):
-
+			# TEMPORARY VARIABLES
 			rows = []
 			columns = []
 			diagonals = []
 			diagonals2 = []
+
+			# STORING POSSIBLE WINNING STATES ROW, COLUMN AND DIAONAL-BASED
 			for k in range(target):
 				if (j+target <= board_size):
 					rows.append((i,j+k))
@@ -39,6 +40,8 @@ def get_teminal_states(board_size, target):
 						diagonals2.append((i-k,j+k))
 				if (i+target <= board_size):
 					columns.append((i+k,j))
+
+			# STORING STATES TO GLOBAL LISTS
 			if (len(rows) != 0): 
 				row_states.append(rows)
 				terminal_states.append(rows)
@@ -56,11 +59,12 @@ def is_terminal(player):
 	full_board = True
 	sign = None
 
+	# CHECK FOR WINNING FOR EACH OF THE TERMINAL STATES
 	for state in terminal_states:
 		sign = None
 		for i in range(len(state)):
 			cell = board[state[i][0]][state[i][1]]
-			if(cell == '-'): full_board = False
+			if(full_board and cell == '-'): full_board = False
 			if (sign is None):
 				sign = cell
 				continue
@@ -68,8 +72,12 @@ def is_terminal(player):
 				if (cell != sign): break
 				elif (i != len(state)-1): continue
 
+			# WHEN REACHED TO THE END AND ALL SIGNS ARE EQUAL
+			#	DETERMINE WHO WINS AND RETURN A VALUE ACCORDINGLY WIN/LOSE
 			return 1 if sign == player else -1
 
+	# IF NOONE WINS AND BOARD IS FULL
+	#	RETURN TIE
 	if (full_board): return 0
 
 def ALPHA_BETA_SEARCH(player, board): # returns an action
