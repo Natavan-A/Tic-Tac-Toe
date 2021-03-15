@@ -124,6 +124,39 @@ def MIN_VALUE(my_player, current_player, board, winning_states, alpha, beta):
 # 		['O','O','X'],
 # 		['X','O','X']]
 
+board = [['O','O','-', '-'],
+		['-','-','-', '-'],
+		['-','-','-', '-'],
+		['X','-', '-', '-']]
+n = 4
+t = 3
+overall_X = 0
+overall_O = 0
+
+for i in range(n):
+	for j in range(n-t+1):
+		print('max:', i, 'max:', j)
+		x = False
+		o = False
+		empty = False
+		for jj in range(j, j+t):
+			print("positions:", i, j, jj, board[i][jj])
+			if(board[i][jj] == '-'): empty = True
+			if(board[i][jj] == 'X'): x = True
+			if(board[i][jj] == 'O'): o = True
+			print('netice :', x, o, empty )
+			# print("beraber:", jj, j+t-1)
+
+		if (x == True and o == False): overall_X = overall_X + 1
+		if (o == True and x == False): overall_O = overall_O + 1
+		if (o == False and x == False and empty):
+			overall_X = overall_X + 1
+			overall_O = overall_O + 1
+
+
+print("cavab:", overall_X, overall_O)
+
+
 # board = [['-' for x in range(12)] for x in range(12)]
 # print(board)
 # this_player = 'X'
