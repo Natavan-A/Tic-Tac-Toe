@@ -80,22 +80,20 @@ class Connection:
         params = f'type=boardMap&gameId={gameId}'
         return self.__send_get_request(params)
 
-    @staticmethod
-    def validate(response):
+    def validate(self, response):
         try:
             if not response:
                 raise HTTPRequestFailureException
 
             data = response.json()
-            if not data['code'] == 'OK': 
-                raise requests.HTTPError
-
             if not data['code'] == 'OK':
                 raise APIFailureException
             
+            return True
+
         except HTTPRequestFailureException:
             print(f'Request has failed with {response.status_code} status code.')
             sys.exit()
         except APIFailureException:
-            print(f'Api returned {data["code"]} code' + f' with the below message\n{data["message"]}' if data["nessage"] else ".")
-            return False
+            print(f'Api returned {data["code"]} code' + f' with the below message\n{data["message"]}' if data["message"] else ".")
+            sys.exit()
