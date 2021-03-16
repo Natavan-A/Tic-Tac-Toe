@@ -32,7 +32,10 @@ def is_terminal(player, board, winning_states):
 
 			# WHEN REACHED TO THE END AND ALL SIGNS ARE EQUAL
 			#	DETERMINE WHO WINS AND RETURN A VALUE ACCORDINGLY WIN/LOSE
-			return 1 if sign == player else -1
+			if (sign == player):
+				return 1
+			elif (sign == switch_player(player)):
+				return -1
 
 	# IF NOONE WINS AND BOARD IS FULL
 	#	RETURN TIE
