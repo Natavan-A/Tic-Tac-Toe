@@ -124,11 +124,12 @@ def MIN_VALUE(my_player, current_player, board, winning_states, alpha, beta):
 # 		['O','O','X'],
 # 		['X','O','X']]
 
-board = [['O','O','-', '-'],
-		['-','-','-', '-'],
-		['-','-','-', '-'],
-		['X','-', '-', '-']]
-n = 4
+board = [['O','O','-', '-', '-'],
+		['X','-','-', '-', '-'],
+		['-','-','-', '-', '-'],
+		['X','-', '-', '-', '-'],
+		['X','-', '-', '-', '-']]
+n = 3
 t = 3
 overall_X = 0
 overall_O = 0
@@ -136,27 +137,75 @@ overall_O = 0
 for i in range(n):
 	for j in range(n-t+1):
 		print('max:', i, 'max:', j)
-		x = False
-		o = False
-		empty = False
+		# Row-based evaluation
+		rx = False
+		ro = False
+		rempty = False
+
+		# Column-based evaluation
+		cx = False
+		co = False
+		cempty = False
+
+
+		# Row-based evaluation writing to overall value
 		for jj in range(j, j+t):
 			print("positions:", i, j, jj, board[i][jj])
-			if(board[i][jj] == '-'): empty = True
-			if(board[i][jj] == 'X'): x = True
-			if(board[i][jj] == 'O'): o = True
-			print('netice :', x, o, empty )
-			# print("beraber:", jj, j+t-1)
+			if (board[i][jj] == '-'): rempty = True
+			if (board[i][jj] == 'X'): rx = True
+			if (board[i][jj] == 'O'): ro = True
+			print('netice :', rx, ro, rempty)
+		# print("beraber:", jj, j+t-1)
 
-		if (x == True and o == False): overall_X = overall_X + 1
-		if (o == True and x == False): overall_O = overall_O + 1
-		if (o == False and x == False and empty):
+		if (rx == True and ro == False): overall_X = overall_X + 1
+		if (ro == True and rx == False): overall_O = overall_O + 1
+		if (ro == False and rx == False and rempty):
 			overall_X = overall_X + 1
 			overall_O = overall_O + 1
 
 
+		# Column-based evaluation writing to overall value
+		for jj in range(j, j+t):
+			# print("positions:", i, j, jj, board[i][jj])
+			print("positions:", jj,i,  board[jj][i])
+
+			if (board[jj][i] == '-'): cempty = True
+			if (board[jj][i] == 'X'): cx = True
+			if (board[jj][i] == 'O'): co = True
+			print('netice :', cx, co, cempty)
+
+		if (cx == True and co == False): overall_X = overall_X + 1
+		if (co == True and cx == False): overall_O = overall_O + 1
+		if (co == False and cx == False and cempty):
+			overall_X = overall_X + 1
+			overall_O = overall_O + 1
+
+
+		# 	if(board[i][jj] == '-'): rempty = True
+		# 	if(board[i][jj] == 'X'): rx = True
+		# 	if(board[i][jj] == 'O'): ro = True
+		# 	print('netice :', rx, ro, rempty)
+		#
+		# 	# print("beraber:", jj, j+t-1)
+		#
+		# if (rx == True and ro == False): overall_X = overall_X + 1
+		# if (ro == True and rx == False): overall_O = overall_O + 1
+		# if (ro == False and rx == False and rempty):
+		# 	overall_X = overall_X + 1
+		# 	overall_O = overall_O + 1
+
+
+
 print("cavab:", overall_X, overall_O)
 
-
+# for i in range (n-t+1):
+# 	for j in range(n):
+# 		print('max:', i, 'max:', j)
+# 		x = False
+# 		o = False
+# 		empty = False
+# 		for jj in range(j, j + t):
+# 			print("positions:", i, j, jj, board[i][i])
 # board = [['-' for x in range(12)] for x in range(12)]
 # print(board)
 # this_player = 'X'
