@@ -13,6 +13,36 @@ def get_moves(board):
 
 	return empy_spots
 
+def evaluation(player, board, winning_states):
+	X_lines = 0
+	O_lines = 0
+	target = len(winning_states[0])
+
+	for state in winning_states:
+		overall_X = 0
+		overall_O = 0
+		overall_E = 0
+
+		# CALCULATE AMOUNT OF X, O AND EMPTY SPOTS
+		for i in range(target):
+			cell = board[state[i][0]][state[i][1]]
+			if (cell == 'X'): overall_X += 1
+			elif (cell == 'O'): overall_O += 1
+			else: overall_E += 1
+
+		if (overall_E > 0):
+			points = target - overall_E
+			if (overall_X > 0 and overall_O == 0):
+				X_lines += points
+			elif (overall_O > 0 and overall_X == 0):
+				O_lines += points
+
+		if (X_lines > O_lines):
+			return float('inf') if player == "X" else float('-inf')
+		elif (X_lines < O_lines):
+			return float('inf') if player == "O" else float('-inf')
+		else: return 0
+
 def is_terminal(player, board, winning_states, level):
 	full_board = True
 	sign = None
@@ -54,12 +84,13 @@ def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an actio
 	bestScore = float('-inf')
 	bestMove = None
 	level = 1
+	max_depth = 6
 	moves = get_moves(board) # game.moves
 
     # find best action
 	for move in moves:
 		board[move[0]][move[1]] = current_player
-		utility = MIN_VALUE(current_player, switch_player(current_player), board, winning_states, alpha, beta, level)
+		utility = MIN_VALUE(current_player, switch_player(current_player), board, winning_states, alpha, beta, level, max_depth)
 		board[move[0]][move[1]] = '-'
 		if (utility > bestScore):
 			bestScore = utility
@@ -67,9 +98,10 @@ def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an actio
 
 	return bestMove
 
-def MAX_VALUE(my_player, current_player, board, winning_states, alpha, beta, level):
+def MAX_VALUE(my_player, current_player, board, winning_states, alpha, beta, level, max_depth):
 	terminal = is_terminal(my_player, board, winning_states, level)
 	if (terminal is not None): return terminal
+	if (level == max_depth): return evaluation(current_player, board, winning_states)
 
 	utility = float('-inf')
 	moves = get_moves(board) # game.moves
@@ -78,16 +110,18 @@ def MAX_VALUE(my_player, current_player, board, winning_states, alpha, beta, lev
     # find maximum value
 	for move in moves:
 		board[move[0]][move[1]] = current_player
-		utility = max(utility, MIN_VALUE(my_player, switch_player(current_player), board, winning_states, alpha, beta, level))
+		utility = max(utility, MIN_VALUE(my_player, switch_player(current_player), 
+											board, winning_states, alpha, beta, level, max_depth))
 		board[move[0]][move[1]] = '-'
 		if utility >= beta: return utility
 		alpha = max(alpha, utility)
 
 	return utility
 
-def MIN_VALUE(my_player, current_player, board, winning_states, alpha, beta, level):
+def MIN_VALUE(my_player, current_player, board, winning_states, alpha, beta, level, max_depth):
 	terminal = is_terminal(my_player, board, winning_states, level)
 	if (terminal is not None): return terminal
+	if (level == max_depth): return evaluation(current_player, board, winning_states)
 
 	utility = float('inf')
 	moves = get_moves(board) # game.moves
@@ -96,7 +130,8 @@ def MIN_VALUE(my_player, current_player, board, winning_states, alpha, beta, lev
     # find minimum value
 	for move in moves:
 		board[move[0]][move[1]] = current_player
-		utility = min(utility, MAX_VALUE(my_player, switch_player(current_player), board, winning_states, alpha, beta, level))
+		utility = min(utility, MAX_VALUE(my_player, switch_player(current_player),
+											board, winning_states, alpha, beta, level, max_depth))
 		board[move[0]][move[1]] = '-'
 		if utility <= alpha: return utility
 		beta = min(beta, utility)
