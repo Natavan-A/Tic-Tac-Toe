@@ -120,7 +120,7 @@ def MIN_VALUE(player, board, alpha, beta): # returns
 	if (terminal is not None): return terminal
 
 	v = float('inf')
-	moves = get_moves(board) # game.moves
+	moves = 20
 
     # find minimum value
 	for move in moves:

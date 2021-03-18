@@ -3,7 +3,7 @@ from copy import deepcopy
 class Team:
     def __init__(self, id, sign, board):
         self.__id             = id
-        self.__sign           = None
+        self.__sign           = sign
         self.__board          = board
         self.__moves          = []
         self.__win_states     = deepcopy(board.get_win_states())
@@ -18,5 +18,5 @@ class Team:
     def is_turn(self):
         return self.__is_turn
 
-    def played(self):
-        self.__is_turn = False
+    def update_turn(self):
+        self.__is_turn = not self.__is_turn

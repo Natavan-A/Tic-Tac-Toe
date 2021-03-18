@@ -38,16 +38,17 @@ if __name__ == "__main__":
 
 
     game = Game(api_key='c9426ee5181dca77e9a2', user_id='1055')
-    game.set_board(size=12, target=11)
+    game.set_board(size=2, target=2)
     game.set_my_team(1248, 'X')
     game.set_opponent_team(1256, 'O')
+    game.set_search()
 
     # game.create()
     game.connect(game_id=1509)
 
-    # while True:
-    #     game.play()
-    #     pygame.time.delay(60)
+    while True:
+        game.play()
+        pygame.time.delay(60)
 
     # game.start_the_game()
     #isitend - teamId - 1248

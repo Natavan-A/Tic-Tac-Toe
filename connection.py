@@ -96,4 +96,4 @@ class Connection:
             sys.exit()
         except APIFailureException:
             print(f'Api returned {data["code"]} code' + f' with the below message\n{data["message"]}' if data["message"] else ".")
-            sys.exit()
+            # sys.exit()
