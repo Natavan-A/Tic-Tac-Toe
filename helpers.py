@@ -33,15 +33,17 @@ def evaluation(player, board, winning_states):
 		if (overall_E > 0):
 			points = target - overall_E
 			if (overall_X > 0 and overall_O == 0):
+				if points > 1: points *=(target**(overall_X-1))
 				X_lines += points
 			elif (overall_O > 0 and overall_X == 0):
+				if points > 1: points *=(target**(overall_O-1))
 				O_lines += points
 
-		if (X_lines > O_lines):
-			return float('inf') if player == "X" else float('-inf')
-		elif (X_lines < O_lines):
-			return float('inf') if player == "O" else float('-inf')
-		else: return 0
+	if (X_lines > O_lines):
+		return float('inf') if player == "X" else float('-inf')
+	elif (X_lines < O_lines):
+		return float('inf') if player == "O" else float('-inf')
+	else: return 0
 
 def is_terminal(player, board, winning_states, level):
 	full_board = True
@@ -79,13 +81,13 @@ def is_terminal(player, board, winning_states, level):
 	if (full_board): return 0
 
 def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an action
+	moves = get_moves(board) # game.moves
 	alpha = float('-inf')
 	beta = float('inf')
 	bestScore = float('-inf')
-	bestMove = None
+	bestMove = moves[0]
 	level = 1
-	max_depth = 6
-	moves = get_moves(board) # game.moves
+	max_depth = 2
 
     # find best action
 	for move in moves:

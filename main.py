@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # game.create()
 
-    game = Game2(connection, 4, 3, 1248, 1256, 'X')
+    game = Game2(connection, 12, 6, 1248, 1256, 'X')
     ttt_board = game.get_ttt_board()
     board = ttt_board.get_board()
     print(board)
