@@ -59,12 +59,12 @@ class Game2:
         self.__my_sign          = my_sign
         self.__opponent_sign    = 'O' if my_sign == 'X' else 'X'
 
-        # # MAKING API REQUEST
-        # response    = self.__connection.create_a_game(my_team_id, opponent_team_id, "TTT", size, target)
+        # MAKING API REQUEST
+        response = self.__connection.create_a_game(my_team_id, opponent_team_id, "TTT", size, target)
         
-        # # CHECKING WHETHER THE REQUEST IS VALID
-        # if Connection.validate(response):
-        #     self.__id = response.json()['game_id']
+        # CHECKING WHETHER THE REQUEST IS VALID
+        if Connection.validate(response):
+            self.__id = response.json()['game_id']
 
     def get_id(self):
     	return self.__id
@@ -82,10 +82,10 @@ class Game2:
     	return self.__my_sign
 
     def get_opponent_id(self):
-    	return self.__my_id
+    	return self.__opponent_id
 
     def get_opponent_sign(self):
     	return self.__opponent_sign
 
-    def make_move(self, sign, row, column):
+    def make_a_move(self, sign, row, column):
     	self.__ttt_board.fill_cell(sign, row, column)

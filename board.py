@@ -32,7 +32,7 @@ class TTT_Board:
         self.__all_cells        = size**2
         self.__filled_cells     = 0
         self.__winning_states   = self.set_winning_states(size, target)
-        self.__board            = [['-' for i in range(size)] for i in range(size)]
+        self.__matrix           = [['-' for i in range(size)] for i in range(size)]
 
     def get_size(self):
         return self.__size
@@ -41,16 +41,17 @@ class TTT_Board:
         return self.__target
     
     def is_full(self):
-        return self.__all_cells == __filled_cells
+        return self.__all_cells == self.__filled_cells
 
     def get_winning_states(self):
         return self.__winning_states
 
-    def get_board(self):
-        return self.__board
+    def get_matrix(self):
+        return self.__matrix
 
     def fill_cell(self, sign, row, column):
-        self.__board[row][column] = sign
+        self.__matrix[row][column] = sign
+        self.__filled_cells += 1
 
     def set_winning_states(self, board_size, target):
         winning_states = []

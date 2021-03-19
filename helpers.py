@@ -2,18 +2,18 @@ def switch_player(player):
 	if (player == 'X'): return 'O'
 	else: return 'X'
 
-def get_moves(board):
+def get_moves(matrix):
 	empy_spots = [] # a list to store moves
-	n = len(board) 	# game.board
+	n = len(matrix) 	# game.board
 
 	# for loops can be removed if board class exists!!!
 	for i in range(n):
 		for j in range(n):
-			if (board[i][j] == '-'): empy_spots.append((i,j))
+			if (matrix[i][j] == '-'): empy_spots.append((i,j))
 
 	return empy_spots
 
-def evaluation(player, board, winning_states):
+def evaluation(player, matrix, winning_states):
 	X_lines = 0
 	O_lines = 0
 	target = len(winning_states[0])
@@ -25,7 +25,7 @@ def evaluation(player, board, winning_states):
 
 		# CALCULATE AMOUNT OF X, O AND EMPTY SPOTS
 		for i in range(target):
-			cell = board[state[i][0]][state[i][1]]
+			cell = matrix[state[i][0]][state[i][1]]
 			if (cell == 'X'): overall_X += 1
 			elif (cell == 'O'): overall_O += 1
 			else: overall_E += 1
@@ -45,23 +45,17 @@ def evaluation(player, board, winning_states):
 		return float('inf') if player == "O" else float('-inf')
 	else: return 0
 
-def is_terminal(player, board, winning_states, level):
-	full_board = True
+def is_terminal(player, board, matrix, winning_states, level):
 	sign = None
 
-	# CHECK FOR EMPTY SPOTS
-	for i in range(len(board)):
-		for j in range(len(board)):
-			if (board[i][j] == '-'):
-				full_board = False
-				break
-		if (full_board == False): break
+	# CHECK IF BOARD IS FULL
+	full_board = board.is_full()
 
 	# CHECK FOR WINNING FOR EACH OF THE TERMINAL STATES
 	for state in winning_states:
 		sign = None
 		for i in range(len(state)):
-			cell = board[state[i][0]][state[i][1]]
+			cell = matrix[state[i][0]][state[i][1]]
 			if (sign is None):
 				sign = cell
 				continue
@@ -81,60 +75,62 @@ def is_terminal(player, board, winning_states, level):
 	if (full_board): return 0
 
 def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an action
-	moves = get_moves(board) # game.moves
+	matrix = board.get_matrix()
+	moves = get_moves(matrix) # game.moves
 	alpha = float('-inf')
 	beta = float('inf')
 	bestScore = float('-inf')
 	bestMove = moves[0]
 	level = 1
-	max_depth = 2
+	max_depth = 8
 
     # find best action
 	for move in moves:
-		board[move[0]][move[1]] = current_player
-		utility = MIN_VALUE(current_player, switch_player(current_player), board, winning_states, alpha, beta, level, max_depth)
-		board[move[0]][move[1]] = '-'
+		matrix[move[0]][move[1]] = current_player
+		utility = MIN_VALUE(current_player, switch_player(current_player),
+								board, matrix, winning_states, alpha, beta, level, max_depth)
+		matrix[move[0]][move[1]] = '-'
 		if (utility > bestScore):
 			bestScore = utility
 			bestMove = move
 
 	return bestMove
 
-def MAX_VALUE(my_player, current_player, board, winning_states, alpha, beta, level, max_depth):
-	terminal = is_terminal(my_player, board, winning_states, level)
+def MAX_VALUE(my_player, current_player, board, matrix, winning_states, alpha, beta, level, max_depth):
+	terminal = is_terminal(my_player, board, matrix, winning_states, level)
 	if (terminal is not None): return terminal
-	if (level == max_depth): return evaluation(current_player, board, winning_states)
+	if (level == max_depth): return evaluation(current_player, matrix, winning_states)
 
 	utility = float('-inf')
-	moves = get_moves(board) # game.moves
+	moves = get_moves(matrix) # game.moves
 	level += 1
 
     # find maximum value
 	for move in moves:
-		board[move[0]][move[1]] = current_player
+		matrix[move[0]][move[1]] = current_player
 		utility = max(utility, MIN_VALUE(my_player, switch_player(current_player), 
-											board, winning_states, alpha, beta, level, max_depth))
-		board[move[0]][move[1]] = '-'
+											board, matrix, winning_states, alpha, beta, level, max_depth))
+		matrix[move[0]][move[1]] = '-'
 		if utility >= beta: return utility
 		alpha = max(alpha, utility)
 
 	return utility
 
-def MIN_VALUE(my_player, current_player, board, winning_states, alpha, beta, level, max_depth):
-	terminal = is_terminal(my_player, board, winning_states, level)
+def MIN_VALUE(my_player, current_player, board, matrix, winning_states, alpha, beta, level, max_depth):
+	terminal = is_terminal(my_player, board, matrix, winning_states, level)
 	if (terminal is not None): return terminal
-	if (level == max_depth): return evaluation(current_player, board, winning_states)
+	if (level == max_depth): return evaluation(current_player, matrix, winning_states)
 
 	utility = float('inf')
-	moves = get_moves(board) # game.moves
+	moves = get_moves(matrix) # game.moves
 	level += 1
 
     # find minimum value
 	for move in moves:
-		board[move[0]][move[1]] = current_player
+		matrix[move[0]][move[1]] = current_player
 		utility = min(utility, MAX_VALUE(my_player, switch_player(current_player),
-											board, winning_states, alpha, beta, level, max_depth))
-		board[move[0]][move[1]] = '-'
+											board, matrix, winning_states, alpha, beta, level, max_depth))
+		matrix[move[0]][move[1]] = '-'
 		if utility <= alpha: return utility
 		beta = min(beta, utility)
 
