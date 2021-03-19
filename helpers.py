@@ -6,7 +6,6 @@ def get_moves(matrix):
 	empy_spots = [] # a list to store moves
 	n = len(matrix) 	# game.board
 
-	# for loops can be removed if board class exists!!!
 	for i in range(n):
 		for j in range(n):
 			if (matrix[i][j] == '-'): empy_spots.append((i,j))
@@ -76,30 +75,27 @@ def is_terminal(player, board, matrix, winning_states, level):
 
 def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an action
 	matrix = board.get_matrix()
-	# moves = board.get_available_moves()
-	moves = get_moves(matrix) # game.moves
+	moves = get_moves(matrix)
 	alpha = float('-inf')
 	beta = float('inf')
 	bestScore = float('-inf')
 	bestMove = moves[0]
 	level = 1
-	max_depth = 8
+	max_depth = 3
 
     # find best action
 	for move in moves:
 		matrix[move[0]][move[1]] = current_player
-		# moves.remove(move)
 		utility = MINIMAX_VALUE(False, current_player, switch_player(current_player),
-								board, matrix, winning_states, moves, alpha, beta, level, max_depth)
+								board, matrix, winning_states, alpha, beta, level, max_depth)
 		matrix[move[0]][move[1]] = '-'
-		# moves.append(move)
 		if (utility > bestScore):
 			bestScore = utility
 			bestMove = move
 
 	return bestMove
 
-def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, winning_states, moves, alpha, beta, level, max_depth):
+def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, winning_states, alpha, beta, level, max_depth):
 	terminal = is_terminal(my_player, board, matrix, winning_states, level)
 	if (terminal is not None): return terminal
 	if (level == max_depth): return evaluation(current_player, matrix, winning_states)
@@ -111,11 +107,9 @@ def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, winning_stat
 		utility = float('-inf')
 		for move in moves:
 			matrix[move[0]][move[1]] = current_player
-			# moves.remove(move)
 			utility = max(utility, MINIMAX_VALUE(False, my_player, switch_player(current_player), 
-												board, matrix, winning_states, moves, alpha, beta, level, max_depth))
+												board, matrix, winning_states, alpha, beta, level, max_depth))
 			matrix[move[0]][move[1]] = '-'
-			# moves.append(move)
 			if utility >= beta: return utility
 			alpha = max(alpha, utility)
 	else:
@@ -123,11 +117,9 @@ def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, winning_stat
 		utility = float('inf')
 		for move in moves:
 			matrix[move[0]][move[1]] = current_player
-			# moves.remove(move)
 			utility = min(utility, MINIMAX_VALUE(True, my_player, switch_player(current_player),
-												board, matrix, winning_states, moves, alpha, beta, level, max_depth))
+												board, matrix, winning_states, alpha, beta, level, max_depth))
 			matrix[move[0]][move[1]] = '-'
-			# moves.append(move)
 			if utility <= alpha: return utility
 			beta = min(beta, utility)
 

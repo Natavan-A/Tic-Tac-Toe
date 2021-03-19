@@ -57,7 +57,7 @@ if __name__ == "__main__":
     # game.create()
     # print(connection.get_my_games())
 
-    game = Game2(connection, 3, 3, 1248, 1256, 'X')
+    game = Game2(connection, 8, 4, 1248, 1256, 'X')
     ttt_board = game.get_ttt_board()
     print(ttt_board.get_matrix())
     winning_states = ttt_board.get_winning_states()
