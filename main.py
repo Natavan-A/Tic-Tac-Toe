@@ -8,9 +8,9 @@ def make_a_move(connection, game, teamId, next_move):
     sign = game.get_my_sign()
     if (teamId != game.get_my_id()): sign = game.get_opponent_sign()
     
-    data = connection.make_a_move(teamId, game.get_id(), next_move_str)
-    ##### if unsuccessful ???
-    game.make_a_move(sign, next_move[0], next_move[1])
+    data = (connection.make_a_move(teamId, game.get_id(), next_move_str)).json()
+    if (data['code'] != 'FAIL'):
+        game.make_a_move(sign, next_move[0], next_move[1])
 
 
 if __name__ == "__main__":
@@ -67,62 +67,18 @@ if __name__ == "__main__":
     make_a_move(connection, game, game.get_my_id(), next_move)
     print(ttt_board.get_matrix())
 
-    data = connection.get_the_move_list(game.get_id())
-    print(data.content)
-
-    # while (ttt_board.is_it_end() == False):
-    #     pass
-
-    # OPPONENT
-    next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_opponent_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    data = connection.get_the_move_list(game.get_id())
-    print(data.content)
-
-    # ME
-    next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_my_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    data = connection.get_the_move_list(game.get_id())
-    print(data.content)
-
-    # OPPONENT
-    next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_opponent_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    # ME
-    next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_my_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    # OPPONENT
-    next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_opponent_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    # ME
-    next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_my_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    # OPPONENT
-    next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_opponent_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    # ME
-    next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_my_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    # OPPONENT
-    # next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
-    # make_a_move(connection, game, game.get_opponent_id(), next_move)
-    # print(ttt_board.get_matrix())
+    while (ttt_board.is_it_end() == False):
+        data = (connection.get_the_move_list(game.get_id())).json()
+        if (int(data['moves'][0]['teamId']) == game.get_my_id()):
+            # OPPONENT
+            next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
+            make_a_move(connection, game, game.get_opponent_id(), next_move)
+            print(ttt_board.get_matrix())
+        else:
+            # ME
+            next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
+            make_a_move(connection, game, game.get_my_id(), next_move)
+            print(ttt_board.get_matrix())
 
     # game.start_the_game()
     #isitend - teamId - 1248
