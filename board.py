@@ -55,9 +55,6 @@ class TTT_Board:
 
     def set_winning_states(self, board_size, target):
         winning_states = []
-        row_states = []
-        column_states = []
-        diagonal_states = []
 
         for i in range(board_size):
             for j in range(board_size):
@@ -78,18 +75,14 @@ class TTT_Board:
                     if (i+target <= board_size):
                         columns.append((i+k,j))
 
-                # STORING STATES TO GLOBAL LISTS
+                # STORING STATES TO THE GLOBAL LIST
                 if (len(rows) != 0): 
-                    row_states.append(rows)
                     winning_states.append(rows)
                 if (len(columns) != 0): 
-                    column_states.append(columns)
                     winning_states.append(columns)
-                if (len(diagonals) != 0): 
-                    diagonal_states.append(diagonals)
+                if (len(diagonals) != 0):
                     winning_states.append(diagonals)
-                if (len(diagonals2) != 0): 
-                    diagonal_states.append(diagonals2)
+                if (len(diagonals2) != 0):
                     winning_states.append(diagonals2)
 
         return winning_states
