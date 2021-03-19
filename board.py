@@ -34,11 +34,23 @@ class TTT_Board:
         self.__winning_states   = self.set_winning_states(size, target)
         self.__matrix           = [['-' for i in range(size)] for i in range(size)]
 
+        max_depth = 3
+        if (size < 7):
+            if (size == 6): max_depth = 4
+            elif (size == 5): max_depth = 5
+            elif (size == 4): max_depth = 6
+            elif (size == 3): max_depth = 8
+
+        self.__max_depth        = max_depth
+
     def get_size(self):
         return self.__size
 
     def get_target(self):
         return self.__target
+
+    def get_max_depth(self):
+        return self.__max_depth
 
     def get_all_cells(self):
         return self.__all_cells

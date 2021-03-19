@@ -32,10 +32,10 @@ def evaluation(player, matrix, winning_states):
 		if (overall_E > 0):
 			points = target - overall_E
 			if (overall_X > 0 and overall_O == 0):
-				# if points > 1: points *=(target**(overall_X-1))
+				if points > 1: points *=(target**(overall_X-1))
 				X_lines += points
 			elif (overall_O > 0 and overall_X == 0):
-				# if points > 1: points *=(target**(overall_O-1))
+				if points > 1: points *=(target**(overall_O-1))
 				O_lines += points
 
 	if (X_lines > O_lines):
@@ -83,7 +83,7 @@ def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an actio
 	bestScore = float('-inf')
 	bestMove = moves[0]
 	moves_amount = board.get_filled_cells()+1
-	max_depth = 10
+	max_depth = board.get_max_depth()
 	level = 1
 
     # find best action
