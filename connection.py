@@ -87,12 +87,14 @@ class Connection:
                 raise HTTPRequestFailureException
 
             data = response.json()
-            if not data['code'] == 'OK': 
-                raise requests.HTTPError
+            # if data['code'] != 'OK': 
+            #     raise requests.HTTPError
 
-            if not data['code'] == 'OK':
+            if data['code'] != 'OK':
                 raise APIFailureException
-            
+
+            return True
+        
         except HTTPRequestFailureException:
             print(f'Request has failed with {response.status_code} status code.')
             sys.exit()

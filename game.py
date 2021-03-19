@@ -64,7 +64,7 @@ class Game2:
         
         # CHECKING WHETHER THE REQUEST IS VALID
         if Connection.validate(response):
-            self.__id = response.json()['game_id']
+            self.__id = response.json()['gameId']
 
     def get_id(self):
     	return self.__id

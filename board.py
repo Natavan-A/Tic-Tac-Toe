@@ -53,6 +53,32 @@ class TTT_Board:
         self.__matrix[row][column] = sign
         self.__filled_cells += 1
 
+    def is_it_end(self, board):
+        sign = None
+        matrix = board.get_matrix()
+        winning_states = board.get_winning_states()
+
+        # CHECK IF BOARD IS FULL
+        full_board = board.is_full()
+        if (full_board): return True
+
+        # CHECK FOR WINNING FOR EACH OF THE TERMINAL STATES
+        for state in winning_states:
+            sign = None
+            for i in range(len(state)):
+                cell = matrix[state[i][0]][state[i][1]]
+                if (sign is None):
+                    sign = cell
+                    continue
+                else:
+                    if (cell != sign): break
+                    elif (i != len(state)-1): continue
+
+                # WHEN REACHED TO THE END AND ALL SIGNS ARE EQUAL
+                return True
+
+        return False
+
     def set_winning_states(self, board_size, target):
         winning_states = []
 
