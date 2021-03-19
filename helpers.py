@@ -39,9 +39,9 @@ def evaluation(player, matrix, winning_states):
 				O_lines += points
 
 	if (X_lines > O_lines):
-		return float('inf') if player == "X" else float('-inf')
+		return 1 if player == "X" else -1
 	elif (X_lines < O_lines):
-		return float('inf') if player == "O" else float('-inf')
+		return 1 if player == "O" else -1
 	else: return 0
 
 def is_terminal(player, board, matrix, moves_amount, winning_states, level):
