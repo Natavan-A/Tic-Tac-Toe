@@ -2,17 +2,6 @@ def switch_player(player):
 	if (player == 'X'): return 'O'
 	else: return 'X'
 
-def get_moves(matrix):
-	empy_spots = [] # a list to store moves
-	n = len(matrix) 	# game.board
-
-	# for loops can be removed if board class exists!!!
-	for i in range(n):
-		for j in range(n):
-			if (matrix[i][j] == '-'): empy_spots.append((i,j))
-
-	return empy_spots
-
 def evaluation(player, matrix, winning_states):
 	X_lines = 0
 	O_lines = 0
@@ -76,7 +65,7 @@ def is_terminal(player, board, matrix, winning_states, level):
 
 def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an action
 	matrix = board.get_matrix()
-	moves = get_moves(matrix) # game.moves
+	moves = board.get_available_moves()
 	alpha = float('-inf')
 	beta = float('inf')
 	bestScore = float('-inf')
@@ -102,7 +91,7 @@ def MAX_VALUE(my_player, current_player, board, matrix, winning_states, alpha, b
 	if (level == max_depth): return evaluation(current_player, matrix, winning_states)
 
 	utility = float('-inf')
-	moves = get_moves(matrix) # game.moves
+	moves = board.get_available_moves()
 	level += 1
 
     # find maximum value
@@ -122,7 +111,7 @@ def MIN_VALUE(my_player, current_player, board, matrix, winning_states, alpha, b
 	if (level == max_depth): return evaluation(current_player, matrix, winning_states)
 
 	utility = float('inf')
-	moves = get_moves(matrix) # game.moves
+	moves = board.get_available_moves()
 	level += 1
 
     # find minimum value

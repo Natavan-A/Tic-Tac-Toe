@@ -31,6 +31,7 @@ class TTT_Board:
         self.__target           = target
         self.__all_cells        = size**2
         self.__filled_cells     = 0
+        self.__available_moves  = []
         self.__winning_states   = self.set_winning_states(size, target)
         self.__matrix           = [['-' for i in range(size)] for i in range(size)]
 
@@ -49,9 +50,13 @@ class TTT_Board:
     def get_matrix(self):
         return self.__matrix
 
+    def get_available_moves(self):
+        return self.__available_moves
+
     def fill_cell(self, sign, row, column):
         self.__matrix[row][column] = sign
         self.__filled_cells += 1
+        self.__available_moves.remove((row, column))
 
     def set_winning_states(self, board_size, target):
         winning_states = []
@@ -63,6 +68,9 @@ class TTT_Board:
                 columns = []
                 diagonals = []
                 diagonals2 = []
+
+                # STORING ALL AVAILABLE POSITIONS IN THE BOARD
+                self.__available_moves.append((i,j))
 
                 # STORING POSSIBLE WINNING STATES ROW, COLUMN AND DIAONAL-BASED
                 for k in range(target):
