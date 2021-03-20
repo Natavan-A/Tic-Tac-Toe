@@ -40,6 +40,7 @@ class TTT_Board:
             elif (size == 5): max_depth = 5
             elif (size == 4): max_depth = 6
             elif (size == 3): max_depth = 8
+        elif (size > 11): max_depth = 2
 
         self.__max_depth        = max_depth
 

@@ -4,7 +4,7 @@ def switch_player(player):
 
 def get_moves(matrix):
 	empy_spots = [] # a list to store moves
-	n = len(matrix) 	# game.board
+	n = len(matrix)
 
 	for i in range(n):
 		for j in range(n):
@@ -38,6 +38,7 @@ def evaluation(player, matrix, winning_states):
 				if points > 1: points *=(target**(overall_O-1))
 				O_lines += points
 
+	# BASED ON THE STATE RETURN APPROPRIATE VALUE
 	if (X_lines > O_lines):
 		return 1 if player == "X" else -1
 	elif (X_lines < O_lines):
@@ -86,7 +87,7 @@ def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an actio
 	max_depth = board.get_max_depth()
 	level = 1
 
-    # find best action
+    # FIND THE BEST ACTION
 	for move in moves:
 		matrix[move[0]][move[1]] = current_player
 		utility = MINIMAX_VALUE(False, current_player, switch_player(current_player),
@@ -104,10 +105,10 @@ def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, moves_amount
 	if (level == max_depth): return evaluation(current_player, matrix, winning_states)
 	level += 1
 	moves_amount += 1
-	moves = get_moves(matrix) # game.moves
+	moves = get_moves(matrix)
 
 	if is_max:
-	    # find maximum value
+	    # FIND MAXIMUM VALUE
 		utility = float('-inf')
 		for move in moves:
 			matrix[move[0]][move[1]] = current_player
@@ -117,7 +118,7 @@ def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, moves_amount
 			if utility >= beta: return utility
 			alpha = max(alpha, utility)
 	else:
-		# find minimum value
+		# FIND MINIMUM VALUE
 		utility = float('inf')
 		for move in moves:
 			matrix[move[0]][move[1]] = current_player
