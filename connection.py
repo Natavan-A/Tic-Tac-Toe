@@ -61,8 +61,12 @@ class Connection:
         return self.__send_post_request(payload)
 
 
-    def get_my_games(self, all=False):
-        params = 'type=' + 'myGames' if open else 'myOpenGames'
+    def get_my_games(self, all_games=False):
+        params = 'type='
+        if all_games:
+            params += 'myGames'
+        else:
+            params += 'myOpenGames'
         return self.__send_get_request(params)
 
 

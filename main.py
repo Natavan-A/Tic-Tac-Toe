@@ -11,6 +11,7 @@ def make_a_move(connection, game, teamId, next_move):
     data = (connection.make_a_move(teamId, game.get_id(), next_move_str)).json()
     if (data['code'] != 'FAIL'):
         game.make_a_move(sign, next_move[0], next_move[1])
+    else: print(data)
 
 
 if __name__ == "__main__":
@@ -30,57 +31,91 @@ if __name__ == "__main__":
     # data, _ = connection.add_a_member(1256, 1055)
     # print(data)
     
-    # CREATING A GAME
-    # data, _ = connection.create_a_game(1248, 1256)
+    # RETRIEVE IDS OF OPEN GAMES
+    myGames = connection.get_my_games().json()['myGames']
+    print("MY OPEN GAMES: "+ str(len(myGames)))
 
-    # MAKING A MOVE
-    # data, _ = connection.make_a_move(1248, 1474, "4,4")
-    # print(data)
-
-    # # MAKING AN OPPONENT MOVE
-    # data, _ = connection.make_a_move(1256, 1474, "4,6")
-    # print(data)
-
-    # data, _ = connection.get_the_move_list(1474)
-    # moves = data['moves'][0]
-    # print(moves['teamId'])
-
-
-
-    # game = Game()
-    # game.set_api_connection(connection)
-    # game.set_target(20)
-    # game.set_board(12)
-    # game.set_my_team(1248, 'X')
-    # game.set_opponent_team(1256, 'O')
-
-    # game.create()
-    # print(connection.get_my_games())
-
-    game = Game2(connection, 12, 6, 1248, 1256, 'O')
-    ttt_board = game.get_ttt_board()
-    print(ttt_board.get_matrix())
-    winning_states = ttt_board.get_winning_states()
-
-    # ME
-    next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_my_id(), next_move)
-    print(ttt_board.get_matrix())
-
-    while (ttt_board.is_it_end() == False):
-        data = (connection.get_the_move_list(game.get_id())).json()
-        if (int(data['moves'][0]['teamId']) == game.get_my_id()):
-            # OPPONENT
-            next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
-            make_a_move(connection, game, game.get_opponent_id(), next_move)
-            print(ttt_board.get_matrix())
+    # PLAY ONE OF THEM
+    if (len(myGames) > 0):
+        print(myGames[-1])
+        game_id = list(myGames[0].keys())[0]
+        parts = myGames[0][game_id].split(':')
+        opponent_id = 0
+        my_sign = 'O'
+        if (int(parts[0]) == 1248): opponent_id = int(parts[1])
         else:
-            # ME
-            next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
-            make_a_move(connection, game, game.get_my_id(), next_move)
-            print(ttt_board.get_matrix())
+            opponent_id = int(parts[0])
+            my_sign = 'X'
 
-    # game.start_the_game()
+        board = connection.get_board_string(game_id).json()['output'].strip()
+        lines = board.split('\n')
+        size = len(lines)
+        target = 6
+        if size < 12: target = 3
+
+        game = Game2(connection, size, target, 1248, opponent_id, my_sign, game_id)
+        ttt_board = game.get_ttt_board()
+        winning_states = ttt_board.get_winning_states()
+
+        for i in range(len(lines)):
+            for j in range(len(lines[i])):
+                ch = lines[i][j]
+                current_teamId = 1248
+                if ch == 'X' or ch == 'O':
+                    game.make_a_move(ch, i, j)
+
+        print(ttt_board.get_matrix())
+
+        # ME
+        next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
+        make_a_move(connection, game, game.get_my_id(), next_move)
+        print(ttt_board.get_matrix())
+                    
+        while (ttt_board.is_it_end() == False):
+            data = (connection.get_the_move_list(game.get_id())).json()
+            if (int(data['moves'][0]['teamId']) == game.get_my_id()):
+                # OPPONENT
+                while(int(data['moves'][0]['teamId']) == game.get_my_id()):
+                    print("waiting for the opponent...")
+                    data = (connection.get_the_move_list(game.get_id())).json()
+
+                # SAVING OPPONENT'S MOVE
+                next_move = (int(data['moves'][0]['moveX']), int(data['moves'][0]['moveY']))
+                game.make_a_move(game.get_opponent_sign(), next_move[0], next_move[1])
+                print(ttt_board.get_matrix())
+            else:
+                # ME
+                next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
+                make_a_move(connection, game, game.get_my_id(), next_move)
+                print(ttt_board.get_matrix())
+
+    # CREATE YOUR OWN GAME
+    # game = Game2(connection, 12, 6, 1248, 1256, 'O')
+    # ttt_board = game.get_ttt_board()
+    # print(ttt_board.get_matrix())
+    # winning_states = ttt_board.get_winning_states()
+
+    # # ME
+    # next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
+    # make_a_move(connection, game, game.get_my_id(), next_move)
+    # print(ttt_board.get_matrix())
+
+    # while (ttt_board.is_it_end() == False):
+    #     data = (connection.get_the_move_list(game.get_id())).json()
+    #     if (int(data['moves'][0]['teamId']) == game.get_my_id()):
+    #         # OPPONENT
+    #         while(int(data['moves'][0]['teamId']) != game.get_my_id()):
+    #             data = (connection.get_the_move_list(game.get_id())).json()
+
+    #         next_move = (int(data['moves'][0]['moveX']), int(data['moves'][0]['moveY']))
+    #         make_a_move(connection, game, game.get_opponent_id(), next_move)
+    #         print(ttt_board.get_matrix())
+    #     else:
+    #         # ME
+    #         next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
+    #         make_a_move(connection, game, game.get_my_id(), next_move)
+    #         print(ttt_board.get_matrix())
+
     #isitend - teamId - 1248
     #helloss - teamId - 1256
     # 1248-1256 -> gameId - 1474
