@@ -53,9 +53,9 @@ def play_an_open_game(connection):
 
         playing(connection, game, ttt_board, winning_states)
 
-def create_and_play_a_game(connection):
+def create_and_play_a_game(connection, opponent_id):
     # CREATE YOUR OWN GAME
-    game = Game2(connection, 12, 6, 1248, 1256, 'O')
+    game = Game2(connection, 12, 6, 1248, opponent_id, 'O')
     ttt_board = game.get_ttt_board()
     winning_states = ttt_board.get_winning_states()
     print(ttt_board.get_matrix())
@@ -105,6 +105,7 @@ if __name__ == "__main__":
     # print(data)
     
     play_an_open_game(connection)
+    #create_and_play_a_game(connection, 1256)
 
     #isitend - teamId - 1248
     #helloss - teamId - 1256
