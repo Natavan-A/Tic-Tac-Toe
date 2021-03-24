@@ -33,7 +33,7 @@ class TTT_Board:
         return self.__filled_cells
     
     def is_full(self):
-        return self.__filled_cells > 0 and self.__all_cells == self.__filled_cells
+        return self.__all_cells == self.__filled_cells
 
     def get_winning_states(self):
         return self.__winning_states

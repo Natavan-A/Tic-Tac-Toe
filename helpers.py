@@ -1,7 +1,9 @@
+# RETURN THE SIGN OF THE OTHER PLAYER
 def switch_player(player):
 	if (player == 'X'): return 'O'
 	else: return 'X'
 
+# GET AVAILABLE MOVES ON THE BOARD
 def get_moves(matrix):
 	empy_spots = [] # a list to store moves
 	n = len(matrix)
@@ -12,6 +14,7 @@ def get_moves(matrix):
 
 	return empy_spots
 
+# RETURN APPROPRIATE VALUE (1,-1,0) BASED ON THE BOARD STATE
 def evaluation(player, matrix, winning_states):
 	X_lines = 0
 	O_lines = 0
@@ -38,13 +41,14 @@ def evaluation(player, matrix, winning_states):
 				if points > 1: points *=(target**(overall_O-1))
 				O_lines += points
 
-	# BASED ON THE STATE RETURN APPROPRIATE VALUE
+	# BASED ON THE SIGNS ON THE BOARD DETERMINE WHICH PLAYER IS IN FAVOR
 	if (X_lines > O_lines):
 		return 1 if player == "X" else -1
 	elif (X_lines < O_lines):
 		return 1 if player == "O" else -1
 	else: return 0
 
+# RETURN A VALUE CONSIDERING THE DEPTH OF THE GAME TREE, IF THE GAME IS OVER
 def is_terminal(player, board, matrix, moves_amount, winning_states, level):
 	sign = None
 
@@ -76,36 +80,45 @@ def is_terminal(player, board, matrix, moves_amount, winning_states, level):
 	#	RETURN TIE
 	if (full_board): return 0
 
-def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an action
-	matrix = board.get_matrix()
-	moves = get_moves(matrix)
-	alpha = float('-inf')
-	beta = float('inf')
-	bestScore = float('-inf')
-	bestMove = moves[0]
-	moves_amount = board.get_filled_cells()+1
-	moves_heuristic = {}
-	max_depth = board.get_max_depth()
-	level = 1
+# RETURN THE BEST ACTION FOR THE PLAYER IN THE CURRENT STATE OF THE BOARD
+def ALPHA_BETA_SEARCH(current_player, board, winning_states):
+	matrix = board.get_matrix()					# board of the current game
+	moves = get_moves(matrix)					# available moves on the board
+	alpha = float('-inf')						# initial alpha value for pruning
+	beta = float('inf')							# initial beta value for pruning
+	bestScore = float('-inf')					# the best utility value among every move
+	bestMove = moves[0]							# the best move/action among every move
+	moves_amount = board.get_filled_cells()+1	# amount of played actions on the board
+	moves_heuristic = {}						# a dictionary to store information about actions
+	max_depth = board.get_max_depth()			# the maximum number of levels in the tree before running out of time
+	level = 1									# current level in the tree
 
     # FIND THE BEST ACTION
 	for move in moves:
+		# PLAY THE MOVE
 		moves_heuristic[move] = 0
 		matrix[move[0]][move[1]] = current_player
 		utility = MINIMAX_VALUE(False, current_player, switch_player(current_player),
 								board, matrix, moves_amount, moves_heuristic, move, winning_states, alpha, beta, level, max_depth)
+		# UNPLAY THE MOVE
 		matrix[move[0]][move[1]] = '-'
+
+		# IF CURRENTLY THE BEST MOVE, SAVE IT
 		if ( utility > bestScore or (utility == bestScore and moves_heuristic[move] > moves_heuristic[bestMove]) ):
 			bestScore = utility
 			bestMove = move
 
 	return bestMove
 
+# RETURN UTILITY VALUE FOR THE STATE
 def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, moves_amount, moves_heuristic, my_move, winning_states, alpha, beta, level, max_depth):
+	# CHECK IF THE GAME IS OVER - WIN/LOSE/TIE
 	terminal = is_terminal(my_player, board, matrix, moves_amount, winning_states, level)
 	if (terminal is not None):
 		moves_heuristic[my_move] += terminal
 		return terminal
+
+	# CHECK IF THE GAME REACHED THE MAXIMUM LEVEL IN THE TREE
 	if (level == max_depth):
 		eval_v = evaluation(current_player, matrix, winning_states)
 		moves_heuristic[my_move] += eval_v
@@ -116,24 +129,31 @@ def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, moves_amount
 	moves = get_moves(matrix)
 
 	if is_max:
-	    # FIND MAXIMUM VALUE
+	    # FIND MAXIMUM VALUE AMOING AVAILABLE MOVES
 		utility = float('-inf')
 		for move in moves:
+			# PLAY THE MOVE
 			matrix[move[0]][move[1]] = current_player
 			utility = max(utility, MINIMAX_VALUE(False, my_player, switch_player(current_player), 
 												board, matrix, moves_amount, moves_heuristic, my_move, winning_states, alpha, beta, level, max_depth))
+			# UNPLAY THE MOVE
 			matrix[move[0]][move[1]] = '-'
+			# PRUNING
 			if utility >= beta: return utility
 			alpha = max(alpha, utility)
 	else:
-		# FIND MINIMUM VALUE
+		# FIND MINIMUM VALUE AMOING AVAILABLE MOVES
 		utility = float('inf')
 		for move in moves:
+			# PLAY THE MOVE
 			matrix[move[0]][move[1]] = current_player
 			utility = min(utility, MINIMAX_VALUE(True, my_player, switch_player(current_player),
 												board, matrix, moves_amount, moves_heuristic, my_move, winning_states, alpha, beta, level, max_depth))
+			# UNPLAY THE MOVE
 			matrix[move[0]][move[1]] = '-'
+			# PRUNING
 			if utility <= alpha: return utility
 			beta = min(beta, utility)
 
+	# RETURN UTILITY VALUE
 	return utility
