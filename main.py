@@ -1,6 +1,5 @@
 from connection import Connection
-from game import Game, Game2
-from team import Team
+from game import Game
 from helpers import ALPHA_BETA_SEARCH
 
 def make_a_move(connection, game, teamId, next_move):
@@ -37,7 +36,7 @@ def play_an_open_game(connection):
         if size < 12: target = 3
 
         # CREATING THE GAME
-        game = Game2(connection, size, target, 1248, opponent_id, my_sign, game_id)
+        game = Game(connection, size, target, 1248, opponent_id, my_sign, game_id)
         ttt_board = game.get_ttt_board()
         winning_states = ttt_board.get_winning_states()
 
@@ -53,9 +52,9 @@ def play_an_open_game(connection):
 
         playing(connection, game, ttt_board, winning_states)
 
-def create_and_play_a_game(connection, opponent_id):
+def create_and_play_a_game(connection, opponent_id, size, target):
     # CREATE YOUR OWN GAME
-    game = Game2(connection, 12, 6, 1248, opponent_id, 'O')
+    game = Game(connection, size, target, 1248, opponent_id, 'O')
     ttt_board = game.get_ttt_board()
     winning_states = ttt_board.get_winning_states()
     print(ttt_board.get_matrix())
@@ -87,6 +86,31 @@ def playing(connection, game, ttt_board, winning_states):
             make_a_move(connection, game, game.get_my_id(), next_move)
             print(ttt_board.get_matrix())
 
+def test_play(connection, opponent_id, size, target):
+    # CREATE YOUR OWN GAME
+    game = Game(connection, size, target, 1248, opponent_id, 'O')
+    ttt_board = game.get_ttt_board()
+    winning_states = ttt_board.get_winning_states()
+    print(ttt_board.get_matrix())
+
+    # ME
+    next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
+    make_a_move(connection, game, game.get_my_id(), next_move)
+    print(ttt_board.get_matrix())
+                
+    while (ttt_board.is_it_end() == False):
+        data = (connection.get_the_move_list(game.get_id())).json()
+        if (int(data['moves'][0]['teamId']) == game.get_my_id()):
+            # OPPONENT
+            next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
+            make_a_move(connection, game, game.get_opponent_id(), next_move)
+            print(ttt_board.get_matrix())
+        else:
+            # ME
+            next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
+            make_a_move(connection, game, game.get_my_id(), next_move)
+            print(ttt_board.get_matrix())
+
 if __name__ == "__main__":
     connection = Connection(api_key='c9426ee5181dca77e9a2', user_id='1055')
     
@@ -104,8 +128,9 @@ if __name__ == "__main__":
     # data, _ = connection.add_a_member(1256, 1055)
     # print(data)
     
-    play_an_open_game(connection)
-    #create_and_play_a_game(connection, 1256)
+    # play_an_open_game(connection)
+    #create_and_play_a_game(connection, 1256, 12, 6)
+    test_play(connection, 1256, 3, 3)
 
     #isitend - teamId - 1248
     #helloss - teamId - 1256

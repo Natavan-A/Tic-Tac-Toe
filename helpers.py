@@ -84,25 +84,33 @@ def ALPHA_BETA_SEARCH(current_player, board, winning_states): # returns an actio
 	bestScore = float('-inf')
 	bestMove = moves[0]
 	moves_amount = board.get_filled_cells()+1
+	moves_heuristic = {}
 	max_depth = board.get_max_depth()
 	level = 1
 
     # FIND THE BEST ACTION
 	for move in moves:
+		moves_heuristic[move] = 0
 		matrix[move[0]][move[1]] = current_player
 		utility = MINIMAX_VALUE(False, current_player, switch_player(current_player),
-								board, matrix, moves_amount, winning_states, alpha, beta, level, max_depth)
+								board, matrix, moves_amount, moves_heuristic, move, winning_states, alpha, beta, level, max_depth)
 		matrix[move[0]][move[1]] = '-'
-		if (utility > bestScore):
+		if ( utility > bestScore or (utility == bestScore and moves_heuristic[move] > moves_heuristic[bestMove]) ):
 			bestScore = utility
 			bestMove = move
 
 	return bestMove
 
-def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, moves_amount, winning_states, alpha, beta, level, max_depth):
+def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, moves_amount, moves_heuristic, my_move, winning_states, alpha, beta, level, max_depth):
 	terminal = is_terminal(my_player, board, matrix, moves_amount, winning_states, level)
-	if (terminal is not None): return terminal
-	if (level == max_depth): return evaluation(current_player, matrix, winning_states)
+	if (terminal is not None):
+		moves_heuristic[my_move] += terminal
+		return terminal
+	if (level == max_depth):
+		eval_v = evaluation(current_player, matrix, winning_states)
+		moves_heuristic[my_move] += eval_v
+		return eval_v
+
 	level += 1
 	moves_amount += 1
 	moves = get_moves(matrix)
@@ -113,7 +121,7 @@ def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, moves_amount
 		for move in moves:
 			matrix[move[0]][move[1]] = current_player
 			utility = max(utility, MINIMAX_VALUE(False, my_player, switch_player(current_player), 
-												board, matrix, moves_amount, winning_states, alpha, beta, level, max_depth))
+												board, matrix, moves_amount, moves_heuristic, my_move, winning_states, alpha, beta, level, max_depth))
 			matrix[move[0]][move[1]] = '-'
 			if utility >= beta: return utility
 			alpha = max(alpha, utility)
@@ -123,7 +131,7 @@ def MINIMAX_VALUE(is_max, my_player, current_player, board, matrix, moves_amount
 		for move in moves:
 			matrix[move[0]][move[1]] = current_player
 			utility = min(utility, MINIMAX_VALUE(True, my_player, switch_player(current_player),
-												board, matrix, moves_amount, winning_states, alpha, beta, level, max_depth))
+												board, matrix, moves_amount, moves_heuristic, my_move, winning_states, alpha, beta, level, max_depth))
 			matrix[move[0]][move[1]] = '-'
 			if utility <= alpha: return utility
 			beta = min(beta, utility)
