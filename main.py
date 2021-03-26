@@ -13,6 +13,7 @@ def make_a_move(connection, game, teamId, next_move):
     else: print(data)
 
 def play_an_open_game(connection):
+    my_id = 1256
     # RETRIEVE IDS OF OPEN GAMES
     myGames = connection.get_my_games().json()['myGames']
     print("MY OPEN GAMES: "+ str(len(myGames)))
@@ -20,11 +21,11 @@ def play_an_open_game(connection):
     # PLAY ONE OF OPEN GAMES
     if (len(myGames) > 0):
         print(myGames[-1])
-        game_id = list(myGames[0].keys())[0]
-        parts = myGames[0][game_id].split(':')
+        game_id = list(myGames[-1].keys())[0]
+        parts = myGames[-1][game_id].split(':')
         opponent_id = 0
         my_sign = 'O'
-        if (int(parts[0]) == 1248): opponent_id = int(parts[1])
+        if (int(parts[0]) == my_id): opponent_id = int(parts[1])
         else:
             opponent_id = int(parts[0])
             my_sign = 'X'
@@ -36,15 +37,16 @@ def play_an_open_game(connection):
         if size < 12: target = 3
 
         # CREATING THE GAME
-        game = Game(connection, size, target, 1248, opponent_id, my_sign, game_id)
+        game = Game(connection, size, target, my_id, opponent_id, my_sign, game_id)
         ttt_board = game.get_ttt_board()
         winning_states = ttt_board.get_winning_states()
+        print(ttt_board.get_matrix())
 
         # STORING ALL PREVIOUS MOVES
         for i in range(len(lines)):
             for j in range(len(lines[i])):
                 ch = lines[i][j]
-                current_teamId = 1248
+                current_teamId = my_id
                 if ch == 'X' or ch == 'O':
                     game.make_a_move(ch, i, j)
 
@@ -57,6 +59,7 @@ def create_and_play_a_game(connection, opponent_id, size, target):
     game = Game(connection, size, target, 1248, opponent_id, 'O')
     ttt_board = game.get_ttt_board()
     winning_states = ttt_board.get_winning_states()
+    print(game.get_id())
     print(ttt_board.get_matrix())
 
     playing(connection, game, ttt_board, winning_states)
@@ -70,6 +73,7 @@ def playing(connection, game, ttt_board, winning_states):
                 
     while (ttt_board.is_it_end() == False):
         data = (connection.get_the_move_list(game.get_id())).json()
+        print(data)
         if (int(data['moves'][0]['teamId']) == game.get_my_id()):
             # OPPONENT
             while(int(data['moves'][0]['teamId']) == game.get_my_id()):
@@ -77,6 +81,7 @@ def playing(connection, game, ttt_board, winning_states):
                 data = (connection.get_the_move_list(game.get_id())).json()
 
             # SAVING OPPONENT'S MOVE
+            print("Opponent played")
             next_move = (int(data['moves'][0]['moveX']), int(data['moves'][0]['moveY']))
             game.make_a_move(game.get_opponent_sign(), next_move[0], next_move[1])
             print(ttt_board.get_matrix())
@@ -128,9 +133,9 @@ if __name__ == "__main__":
     # data, _ = connection.add_a_member(1256, 1055)
     # print(data)
     
-    # play_an_open_game(connection)
-    #create_and_play_a_game(connection, 1256, 12, 6)
-    test_play(connection, 1256, 3, 3)
+    play_an_open_game(connection)
+    # create_and_play_a_game(connection, 1256, 12, 6)
+    # test_play(connection, 1256, 12, 6)
 
     #isitend - teamId - 1248
     #helloss - teamId - 1256
