@@ -4,7 +4,7 @@
 Kef edin
 
 ## VERSIONS
-There are 2 versionS of the game in the different named branchs, main and tic_tac_toe_version_2 respectively. In these 2 different versions, different internal structure, working mechanism, heuristinc and evaluations has been tried and applied.
+There are 2 versions of the game in the different named branchs, main and tic_tac_toe_version_2 respectively. In these 2 different versions, different internal structure, working mechanism, heuristinc and evaluations has been tried and applied.
 
 ## HOW TO RUN
 ### Version 1
