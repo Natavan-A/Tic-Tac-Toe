@@ -1,87 +1,63 @@
 from copy import deepcopy
 
 class AlphaBetaSearch:
-    def __init__(self,  board, my_team, opponent_team):
-        self.__board            = board
-        self.__my_team          = my_team
-        self.__opponent_team    = opponent_team
 
+    def __init__(self, state):
+        self.state = state
 
-    def __switch_players(self, player):
-        return self.__my_team if not player == self.__my_team else self.__opponent_team
-
-    def __terminal_test(self, state):
-        if state.is_full() or state.has_winner():
-            return True
+    def terminal_test(self):
+        if self.state.has_moves(enough=True): 
+            if self.state.is_terminal(): return True
         return False
 
-    def __utility(self, state, player):
-        if state.has_winner():
-            if player == state.get_winner(): 
-                return 1
-            return 0
-        return 0.5
+    def __utility(self):
+        return self.state.get_latest_move().get_score()
+
+    def __max_value(self, depth, alpha, beta):
+
+        best_score, best_move = float("-inf"), None
+
+        if not depth or self.terminal_test(): return self.__utility()
+
+        for move in self.state.get_empty_squares_sorted()[:3]:
+
+            self.state.set_square(move)
+
+            previous_best_score, best_score = best_score, max(best_score, self.__min_value(depth - 1, alpha, beta))
+
+            if not previous_best_score == best_score: best_move = move
+
+            if best_score >= beta: alpha = max(alpha, best_score)
+
+            self.state.undo()
+
+        if self.state.has_moves(): return best_score
+
+        return best_move
 
 
-    def __result(self, state, player, move):
-        state.set_move(player, move)
-        state.update_available_moves(move)
-        return state
+    def __min_value(self, depth, alpha, beta):
 
-    def __max_value(self, state, player, a, b):
-        if self.__terminal_test(state): return self.__utility(state, player)
+        worst_score, worst_move = float("inf"), None
 
-        v = float("-inf")
-        best_move = None
+        if not depth or self.terminal_test(): return self.__utility()
 
-        for move in state.get_available_moves():
-            temp = v
+        for move in self.state.get_empty_squares_sorted()[:3]:
             
-            state_copied  = self.__result(deepcopy(state), player, move)
-            player_copied = self.__switch_players(deepcopy(player))
+            self.state.set_square(move)
 
-            v = max(v, self.__min_value(state_copied, player_copied, a, b))
-
-            if not temp == v: best_move = move
-
-            if v >= b: a = max(a, v)
-
-        state.get_move(best_move).set_value(v)
-
-        return v
-
-    def __min_value(self, state, player, a, b):
-        if self.__terminal_test(state): return self.__utility(state, player)
-
-        v = float("inf")
-        worst_move = None
-
-        for move in state.get_available_moves():
-            temp = v
-
-            state_copied  = self.__result(deepcopy(state), player, move)
-            player_copied = self.__switch_players(deepcopy(player))
-
-            v = min(v, self.__max_value(state_copied, player_copied, a, b))
+            previous_worst_score, worst_score = worst_score, min(worst_score, self.__max_value(depth - 1, alpha, beta))
             
-            if not temp == v: worst_move = move
+            if not previous_worst_score == worst_score: worst_move = move
 
-            if v <= a: b = min(b, v)
+            if worst_score <= alpha: beta = min(beta, worst_score)
 
-        state.get_move(worst_move).set_value(v)
+            self.state.undo()
 
-        return v
+        if self.state.has_moves(): return worst_score
 
-    def start(self, ):
-        state  = deepcopy(self.__board)
-        player = deepcopy(self.__my_team)
-
-        best_move  = None
-        best_value = float('-inf')
-
-        for move in state.get_available_moves():
-            v = self.__max_value(state, player, a=float('-inf'), b=float('inf'))
-
-        move = state.get_best_move(v)
-
-        return move
+        return worst_move
+        
+        
+    def start(self):
+        return self.__max_value(depth=3, alpha=float('-inf'), beta=float('inf'))

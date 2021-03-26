@@ -1,7 +1,8 @@
 from connection import Connection
+from player import Player
+from board import Board
 from game import Game
-from team import Team
-import pygame
+import time
 
 if __name__ == "__main__":
     
@@ -33,22 +34,25 @@ if __name__ == "__main__":
 
     # data, _ = connection.get_the_move_list(1474)
     # moves = data['moves'][0]
-    # print(moves['teamId'])
-
-
+    # print(moves['teamId'])    
+    player      = Player(1248, 'X')
+    opponent    = Player(1256, 'O', opponent=True)
 
     game = Game(api_key='c9426ee5181dca77e9a2', user_id='1055')
-    game.set_board(size=2, target=2)
-    game.set_my_team(1248, 'X')
-    game.set_opponent_team(1256, 'O')
-    game.set_search()
+    game.set_opponent(opponent)
+    game.set_player(player)
+    game.set_board(size=12, target=6)
 
-    # game.create()
-    game.connect(game_id=1509)
+    game.create()
+    # game.connect(game_id=1509)
 
-    while True:
-        game.play()
-        pygame.time.delay(60)
+    # winner = game.start()
+    winner = game.testing()
+
+    if winner:
+        print(f'Winner is {winner}')
+    else:
+        print('Game is tie!')
 
     # game.start_the_game()
     #isitend - teamId - 1248
@@ -56,5 +60,4 @@ if __name__ == "__main__":
     # 1248-1256 -> gameId - 1474
 
     # natavan -> 1051
-    # aydin   -> 1055
-    # ilyas   -> 1040
+    # aydin   -> 1055       
