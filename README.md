@@ -13,7 +13,7 @@ There are 2 version of the game in the different named branchs, main and tic_tac
 ## Version 2
 * python .\main.py
 
-** Before running any version, from main file appropriate tuning should be made such as aggreed board size, either joining or creating a game and opponent team id.
+** Before running any version, on the main.py file appropriate tuning should be made such as aggreed board size, either joining or creating a game and opponent team id.
 
 # Copyright
 
