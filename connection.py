@@ -93,7 +93,7 @@ class Connection:
 
         except HTTPRequestFailureException:
             print(f'Request has failed with {response.status_code} status code.')
-            sys.exit()
+            return False
         except APIFailureException:
-            print(f'Api returned {data["code"]} code' + f' with the below message\n{data["message"]}' if data["message"] else ".")
-            # sys.exit()
+            print(f'Api returned {data["code"]} code with the below message\n{data["message"]}' if data["message"] else ".")
+            return False

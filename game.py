@@ -3,8 +3,8 @@ from connection        import Connection
 from board             import Board
 from player            import Player
 from square            import Square
-import pygame
 import time
+import sys
 
 class Game:
     def __init__(self, api_key, user_id):
@@ -45,6 +45,9 @@ class Game:
         if self.__connection.validate(response):
             game_id = response.json()['gameId']
             self.__set_id(game_id)
+        else:
+            print("Exiting from the system")
+            sys.exit()
 
 
     def connect(self, game_id):
@@ -54,38 +57,37 @@ class Game:
         if self.__connection.validate(response):
             self.__set_id(game_id)
             print(f'Connected to the game {game_id}')
+        else:
+            print("Exiting from the system")
+            sys.exit()
 
     def testing(self):
 
-            board       = self.__board
-            opponent    = self.__opponent
-            search      = AlphaBetaSearch(board)
-            start       = time.time()
-            end_game    = False
+        board       = self.__board
+        opponent    = self.__opponent
+        search      = AlphaBetaSearch(board)
+        start       = time.time()
 
-            while not end_game:
+        while True:
 
-                response = None
+            if not board.get_current_player() is opponent: # if my turn
+                move = search.start()
+                print(f'{move.get_position()} -> player')
+            else:
+                print('INPUT')
+                x, y = map(int, input().split())
+                move = board.get_move((x, y))
+                # move = search.start()
+                print(f'{move.get_position()} -> opponent')
 
-                if not board.get_current_player() is opponent: # if my turn
-                    move = search.start()
-                    print(f'{move.get_position()} -> player')
-                else:
-                    print('INPUT')
-                    x, y = map(int, input().split())
-                    move = board.get_move((x, y))
-                    # move = search.start()
-                    print(f'{move.get_position()} -> opponent')
+            end = time.time()
+            board.set_square(move)
+            board.record_round()
+            board.sketch_board()
+            print('Evaluation time: {}s'.format(round(end - start, 7)))
+            if search.terminal_test(): break
 
-                end = time.time()
-                board.set_square(move)
-                board.record_round()
-                board.sketch_board()
-                if search.terminal_test(): end_game = True
-                print('Evaluation time: {}s'.format(round(end - start, 7)))
-                # pygame.time.delay(600)
-
-            return self.__board.get_winner().get_sign()
+        return self.__board.get_winner().get_sign()
 
 
     def start(self):
@@ -94,84 +96,41 @@ class Game:
         opponent    = self.__opponent
         search      = AlphaBetaSearch(board)
         start       = time.time()
-        end_game    = False
 
-        while not end_game:
-
-            response = None
-
-            if not board.get_current_player() is opponent: # if my turn
+        while True:
+            # IF IT IS MY TURN
+            if not board.get_current_player() is opponent:
 
                 move = search.start()
-                response = self.__connection.make_a_move(teamId=self.__player.get_id(), gameId=self.__id, move=f'{move.get_x()},{move.get_y()}')
                 
-                while not self.__connection.validate(response):
+                while True:
                     response = self.__connection.make_a_move(teamId=self.__player.get_id(), gameId=self.__id, move=f'{move.get_x()},{move.get_y()}')
+                    
+                    if self.__connection.validate(response): break
 
                 print(f'{move.get_position()} -> player')
+
+            # IF IT IS OPPONENT TURN
             else:
-                # print('INPUT')
-                # x, y = map(int, input().split())
-                # move = board.get_move((x, y))
-                response = self.__connection.get_the_move_list(gameId=self.__id)
-                while not self.__connection.validate(response) or not response.json()['moves'][0]['teamId'] == self.__player.get_id():
+                while True:
                     response = self.__connection.get_the_move_list(gameId=self.__id)
-                    move = tuple(map(int, response.json()['moves'][0]['move'].split(',')))
-                    move = self.__board.get_move(move)
+                    latest_player = response.json()['moves'][0]['teamId']
+
+                    if self.__connection.validate(response) and latest_player.__eq__(self.__opponent): break
+
                     print('wainting opponent')
-                # move = search.start()
+               
+                move_position   = tuple(map(int, response.json()['moves'][0]['move'].split(',')))
+                move            = self.__board.get_move(move_position)
+
                 print(f'{move.get_position()} -> opponent')
 
             end = time.time()
             board.set_square(move)
             board.record_round()
             board.sketch_board()
-            if search.terminal_test(): end_game = True
             print('Evaluation time: {}s'.format(round(end - start, 7)))
-            # pygame.time.delay(600)
+
+            if search.terminal_test(): break
 
         return self.__board.get_winner().get_sign()
-
-
-
-
-
-
-
-
-
-    # def start(self):
-
-    #     board   = self.__board
-    #     search  = AlphaBetaSearch()
-    #     start   = time.time()
-    #     self.__board.sketch_board()
-
-    #     while True:
-    #         # IF IT IS MY TURN
-    #         move = search.start(board)
-                
-            
-    #         if board.get_current_player() is self.__player:
-    #             print(f'{move.get_position()} -> player')
-    #                 # response = self.__connection.make_a_move(teamId=self.__my_team.get_id(), gameId=self.__id, move=f'{move[0]},{move[1]}')
-
-    #         # IF IT IS OPPONENT TURN
-    #         else:
-    #             # response = self.__connection.get_the_move_list(gameId=self.__id)
-    #             print(f'{move.get_position()} -> opponent')
-    #             # if self.__connection.validate(response):
-    #                 # move = tuple(map(int, response.json()['moves'][0]['move'].split(',')))
-    #                 # if self.__board.get_move(move).is_assigned():
-    #                 #     print('not yet played') 
-    #             #     return
-    #         end = time.time()
-    #         print('Evaluation time: {}s'.format(round(end - start, 7)))
-           
-    #         # if self.__connection.validate(response):
-    #         self.__board.set_square(move), self.__board.sketch_board()
-    #         pygame.time.delay(600)
-
-
-        
-        
