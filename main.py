@@ -33,8 +33,7 @@ def play_an_open_game(connection):
         board = connection.get_board_string(game_id).json()['output'].strip()
         lines = board.split('\n')
         size = len(lines)
-        target = 6
-        if size < 12: target = 3
+        target = int(connection.get_board_string(game_id).json()['target'])
 
         # CREATING THE GAME
         game = Game(connection, size, target, my_id, opponent_id, my_sign, game_id)
@@ -122,8 +121,8 @@ if __name__ == "__main__":
     # data, _ = connection.create_a_team(name='helloss')
 
     # ADDING TEAM MEMBERS TO TEAMS
-    # data, _ = connection.add_a_member(1248, 1055)
-    # print(data)
+    # data = connection.add_a_member(1255, 1055)
+    # print(data.json())
     # data, _ = connection.add_a_member(1248, 1040)
     # print(data)
     # data, _ = connection.add_a_member(1256, 1051)
@@ -133,12 +132,13 @@ if __name__ == "__main__":
     # data, _ = connection.add_a_member(1256, 1055)
     # print(data)
     
-    play_an_open_game(connection)
+    # play_an_open_game(connection)
     # create_and_play_a_game(connection, 1256, 12, 6)
     # test_play(connection, 1256, 12, 6)
 
     #isitend - teamId - 1248
     #helloss - teamId - 1256
+    #hellls  - teamId - 1255
     # 1248-1256 -> gameId - 1474
 
     # natavan -> 1051
