@@ -13,7 +13,7 @@ def make_a_move(connection, game, teamId, next_move):
     else: print(data)
 
 def play_an_open_game(connection):
-    my_id = 1256
+    my_id = 1248
     # RETRIEVE IDS OF OPEN GAMES
     myGames = connection.get_my_games().json()['myGames']
     print("MY OPEN GAMES: "+ str(len(myGames)))
@@ -30,12 +30,15 @@ def play_an_open_game(connection):
             opponent_id = int(parts[0])
             my_sign = 'X'
 
-        board = connection.get_board_string(game_id).json()['output'].strip()
+        requestInfo = connection.get_board_string(game_id).json()
+        board = requestInfo['output'].strip()
         lines = board.split('\n')
         size = len(lines)
-        target = int(connection.get_board_string(game_id).json()['target'])
+        target = int(requestInfo['target'])
 
-        # CREATING THE GAME
+        print("Board Size: "+str(size)+"; Target: "+str(target))
+
+        CREATING THE GAME
         game = Game(connection, size, target, my_id, opponent_id, my_sign, game_id)
         ttt_board = game.get_ttt_board()
         winning_states = ttt_board.get_winning_states()
@@ -132,9 +135,10 @@ if __name__ == "__main__":
     # data, _ = connection.add_a_member(1256, 1055)
     # print(data)
     
+    ################ IMPORTANT COMMANDS ############
     # play_an_open_game(connection)
     # create_and_play_a_game(connection, 1256, 12, 6)
-    # test_play(connection, 1256, 12, 6)
+    ################################################
 
     #isitend - teamId - 1248
     #helloss - teamId - 1256
