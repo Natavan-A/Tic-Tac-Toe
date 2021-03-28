@@ -1,3 +1,4 @@
+import time
 from connection import Connection
 from game import Game
 from helpers import ALPHA_BETA_SEARCH
@@ -111,6 +112,7 @@ def playing(connection, game, ttt_board, winning_states):
             while(int(data['moves'][0]['teamId']) == game.get_my_id()):
                 print("waiting for the opponent...")
                 data = (connection.get_the_move_list(game.get_id())).json()
+                time.sleep(7)
 
             # SAVING OPPONENT'S MOVE
             print("Opponent played")
