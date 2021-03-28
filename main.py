@@ -38,7 +38,7 @@ def play_an_open_game(connection):
 
         print("Board Size: "+str(size)+"; Target: "+str(target))
 
-        CREATING THE GAME
+        # CREATING THE GAME
         game = Game(connection, size, target, my_id, opponent_id, my_sign, game_id)
         ttt_board = game.get_ttt_board()
         winning_states = ttt_board.get_winning_states()
@@ -55,6 +55,36 @@ def play_an_open_game(connection):
         print(ttt_board.get_matrix())
 
         playing(connection, game, ttt_board, winning_states)
+
+def play_an_open_game_with_id(connection, game_id, opponent_id):
+    my_id = 1248
+    my_sign = 'X'
+
+    requestInfo = connection.get_board_string(game_id).json()
+    board = requestInfo['output'].strip()
+    lines = board.split('\n')
+    size = len(lines)
+    target = int(requestInfo['target'])
+
+    print("Board Size: "+str(size)+"; Target: "+str(target))
+
+    # CREATING THE GAME
+    game = Game(connection, size, target, my_id, opponent_id, my_sign, game_id)
+    ttt_board = game.get_ttt_board()
+    winning_states = ttt_board.get_winning_states()
+    print(ttt_board.get_matrix())
+
+    # STORING ALL PREVIOUS MOVES
+    for i in range(len(lines)):
+        for j in range(len(lines[i])):
+            ch = lines[i][j]
+            current_teamId = my_id
+            if ch == 'X' or ch == 'O':
+                game.make_a_move(ch, i, j)
+
+    print(ttt_board.get_matrix())
+
+    playing(connection, game, ttt_board, winning_states)
 
 def create_and_play_a_game(connection, opponent_id, size, target):
     # CREATE YOUR OWN GAME
@@ -95,28 +125,32 @@ def playing(connection, game, ttt_board, winning_states):
 
 def test_play(connection, opponent_id, size, target):
     # CREATE YOUR OWN GAME
-    game = Game(connection, size, target, 1248, opponent_id, 'O')
+    sign = 'O'
+    game = Game(connection, size, target, 1248, opponent_id, sign)
     ttt_board = game.get_ttt_board()
     winning_states = ttt_board.get_winning_states()
     print(ttt_board.get_matrix())
 
     # ME
     next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
-    make_a_move(connection, game, game.get_my_id(), next_move)
+    # make_a_move(connection, game, game.get_my_id(), next_move)
+    game.make_a_move(sign, next_move[0], next_move[1])
     print(ttt_board.get_matrix())
                 
     while (ttt_board.is_it_end() == False):
-        data = (connection.get_the_move_list(game.get_id())).json()
-        if (int(data['moves'][0]['teamId']) == game.get_my_id()):
-            # OPPONENT
-            next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
-            make_a_move(connection, game, game.get_opponent_id(), next_move)
-            print(ttt_board.get_matrix())
-        else:
-            # ME
-            next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
-            make_a_move(connection, game, game.get_my_id(), next_move)
-            print(ttt_board.get_matrix())
+        # data = (connection.get_the_move_list(game.get_id())).json()
+        # if (int(data['moves'][0]['teamId']) == game.get_my_id()):
+        # OPPONENT
+        next_move = ALPHA_BETA_SEARCH(game.get_opponent_sign(), ttt_board, winning_states)
+        # make_a_move(connection, game, game.get_opponent_id(), next_move)
+        game.make_a_move(game.get_opponent_sign(), next_move[0], next_move[1])
+        print(ttt_board.get_matrix())
+        # else:
+        # ME
+        next_move = ALPHA_BETA_SEARCH(game.get_my_sign(), ttt_board, winning_states)
+        # make_a_move(connection, game, game.get_my_id(), next_move)
+        game.make_a_move(sign, next_move[0], next_move[1])
+        print(ttt_board.get_matrix())
 
 if __name__ == "__main__":
     connection = Connection(api_key='c9426ee5181dca77e9a2', user_id='1055')
@@ -135,8 +169,10 @@ if __name__ == "__main__":
     # data, _ = connection.add_a_member(1256, 1055)
     # print(data)
     
+    # print(connection.get_my_games().json()['myGames'])
+    # print(connection.get_board_string("2750").json())
     ################ IMPORTANT COMMANDS ############
-    # play_an_open_game(connection)
+    play_an_open_game_with_id(connection, 2750, 1244)
     # create_and_play_a_game(connection, 1256, 12, 6)
     ################################################
 
