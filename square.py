@@ -10,7 +10,7 @@ class Square:
         self.__terminals.append(terminal)
     
     def update_score(self, score):
-        self.__score += score
+        self.__score += score * len(self.__terminals)
 
     def set_assignee(self, player):
         self.__assignee = player

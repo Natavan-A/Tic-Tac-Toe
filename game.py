@@ -3,6 +3,7 @@ from connection        import Connection
 from board             import Board
 from player            import Player
 from square            import Square
+import pygame
 import time
 import sys
 
@@ -21,20 +22,22 @@ class Game:
         self.__id = id
         print(f'Game {id} has been created.')
 
-    # PUBLIC METHODS
-    def set_board(self, size=12, target=6):
+    def __set_board(self, size=12, target=6):
         players = [self.__player, self.__opponent]
         self.__board = Board(size, target, players)
+        
+    # PUBLIC METHODS
 
-    def set_player(self, player):
-        self.__player = player
+    def get_board(self):
+        return self.__board
+        
+    def create(self, player, opponent, board_size, target, game_type="TTT"):
 
-    def set_opponent(self, opponent):
-        self.__opponent = opponent
+        self.__player   = Player(player[0], player[1])
+        self.__opponent = Player(opponent[0], opponent[1], opponent=True)
+        self.__set_board(board_size, target)
 
-    def create(self, game_type="TTT"):
-
-        response = self.__connection.create_a_game(
+        data = self.__connection.create_a_game(
             self.__player.get_id(), 
             self.__opponent.get_id(), 
             game_type, 
@@ -42,23 +45,21 @@ class Game:
             self.__board.get_target()
         )
         
-        if self.__connection.validate(response):
-            game_id = response.json()['gameId']
-            self.__set_id(game_id)
+        if data: self.__set_id(data['gameId'])
         else:
             print("Exiting from the system")
             sys.exit()
 
 
-    def connect(self, game_id):
+    def connect(self, player, game_id):
         # CHECK WHETHER GAME ID EXISTS
-        response = self.__connection.get_board_string(game_id)
+        data = self.__connection.get_board_string(game_id)
 
-        if self.__connection.validate(response):
+        if data:
             self.__set_id(game_id)
-            print(f'Connected to the game {game_id}')
+            print(f'Connected to the game {game_id}.')
         else:
-            print("Exiting from the system")
+            print("Error! Exiting from the game.")
             sys.exit()
 
     def testing(self):
@@ -95,40 +96,37 @@ class Game:
         board       = self.__board
         opponent    = self.__opponent
         search      = AlphaBetaSearch(board)
-        start       = time.time()
+        data        = None
 
         while True:
-            # IF IT IS MY TURN
+            start = time.time() # record start time
+
+            # if the turn is mine
             if not board.get_current_player() is opponent:
-
                 move = search.start()
-                
-                while True:
-                    response = self.__connection.make_a_move(teamId=self.__player.get_id(), gameId=self.__id, move=f'{move.get_x()},{move.get_y()}')
-                    
-                    if self.__connection.validate(response): break
+                while True: 
+                    data = self.__connection.make_a_move(teamId=self.__player.get_id(), gameId=self.__id, move=f'{move.get_x()},{move.get_y()}')
+                    if data: break                    
 
-                print(f'{move.get_position()} -> player')
+            # get latest move and record it
+            while True:
+                data = self.__connection.get_the_move_list(gameId=self.__id)
 
-            # IF IT IS OPPONENT TURN
-            else:
-                while True:
-                    response = self.__connection.get_the_move_list(gameId=self.__id)
-                    latest_player = response.json()['moves'][0]['teamId']
+                if data:
+                    last_player = data['moves'][0]['teamId']
+                    if self.__opponent.__eq__(last_player): break
 
-                    if self.__connection.validate(response) and latest_player.__eq__(self.__opponent): break
+                print('waiting opponent')
+            
+            end     = time.time() # record end time
+            move    = self.__board.get_move(tuple(map(int, data['moves'][0]['move'].split(','))))
 
-                    print('wainting opponent')
-               
-                move_position   = tuple(map(int, response.json()['moves'][0]['move'].split(',')))
-                move            = self.__board.get_move(move_position)
+            print(f'Round: {board.get_round()}\n Last move: {move.get_position()}\n Player: {board.get_current_player()}')
 
-                print(f'{move.get_position()} -> opponent')
+            board.set_square(move) # store the move
+            board.record_round()  # we should know what round of the game it is
+            board.sketch_board() # draw the board
 
-            end = time.time()
-            board.set_square(move)
-            board.record_round()
-            board.sketch_board()
             print('Evaluation time: {}s'.format(round(end - start, 7)))
 
             if search.terminal_test(): break

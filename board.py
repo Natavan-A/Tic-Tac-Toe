@@ -158,21 +158,6 @@ class Board:
 
 
         print(f'Terminals calculated')
-
-    # def __compute_scores(self):
-    #     scores_table        = {str([None]*self.__target):1}
-
-    #     for i in range(1, self.__target + 1):
-    #         pattern_current = [self.get_current_player] * i
-    #         pattern_next = [] * i
-    #         pattern_not_match = [] *i
-    #         power = fib(i)
-    #         scores_table[str([self.get_next_player()]     * i + [None] * (self.__target - i))] = 10 ** power
-    #         scores_table[str([self.get_current_player()]  * i + [None] * (self.__target - i))] = 10 ** power
-    #         scores_table[str([self.get_current_player()]  * i + [self.get_next_player()] * (self.__target - i))] = -100
-    #         scores_table[str([self.get_current_player()]  * i + [self.get_next_player()] * (self.__target - i))] = -100
-
-    #     return scores_table
         
     # PUBLIC METHODS
     def get_move(self, move):
@@ -248,7 +233,7 @@ class Board:
 
     def is_terminal(self):
         square          = self.__moves[-1] # lastest move
-        previous_player  = self.__players[1]
+        previous_player  = self.get_next_player() # next player is logically was previous one
         win_state       = [previous_player] * self.__target
         
         if self.is_full(): return True
@@ -266,11 +251,10 @@ class Board:
             for terminal in [[square.get_assignee() for square in terminal] for terminal in square.get_terminals()]:
                 u_terminal = set(terminal)
                 if any(u_terminal):
-                    if len(u_terminal) == 3: 
-                        square.update_score(-100)
+                    if len(u_terminal) == 3: square.update_score(-100)
                     else:
                         player = u_terminal.__iter__().__next__()
-                        count = len(list(filter(lambda item: item is player, terminal)))
+                        count  = len(list(filter(lambda item: item is player, terminal)))
                         square.update_score(10**count)
                 else:
                     square.update_score(1)

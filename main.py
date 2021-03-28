@@ -4,22 +4,19 @@ from board import Board
 from game import Game
 import time
 
-if __name__ == "__main__": 
-    player      = Player(1248, 'X')
-    opponent    = Player(1256, 'O', opponent=True)
+if __name__ == "__main__":
 
     game = Game(api_key='c9426ee5181dca77e9a2', user_id='1055')
-    game.set_opponent(opponent)
-    game.set_player(player)
-    game.set_board(size=12, target=6)
+    # 1256 1255
+    game.create(player=(1255, 'X'), opponent=(1256, 'O'), board_size=6, target=4)
+    # game.connect(game_id=1509)
 
-    # game.create()
-    game.connect(game_id=1509)
-
-    # winner = game.start()
-    winner = game.testing()
+    winner = game.start()
+    # winner = game.testing()
+    
+    print(f'Game ended at the round {game.get_board().get_round()}')
 
     if winner:
-        print(f'Winner is {winner}')
+        print(f'The winner is {winner}')
     else:
-        print('Game is tie!')    
+        print('There is no winner. Game is tie!')    

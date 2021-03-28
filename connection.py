@@ -27,7 +27,8 @@ class Connection:
             'type': 'team', 
             'name': name
         }
-        return self.__send_post_request(payload)
+        response = self.__send_post_request(payload)
+        return self.__validate(response)
 
 
     def add_a_member(self, teamId, userId):
@@ -36,7 +37,8 @@ class Connection:
             'teamId': teamId,
             'userId': userId
         }
-        return self.__send_post_request(payload)
+        response = self.__send_post_request(payload)
+        return self.__validate(response)
 
 
     def create_a_game(self, teamId1, teamId2, gameType, boardSize, target):
@@ -48,7 +50,8 @@ class Connection:
             'boardSize': str(boardSize), 
             'target'   : str(target)
         }
-        return self.__send_post_request(payload)
+        response = self.__send_post_request(payload)
+        return self.__validate(response)
 
 
     def make_a_move(self, teamId, gameId, move):
@@ -58,29 +61,34 @@ class Connection:
             'gameId': gameId, 
             'move'  : move 
         }
-        return self.__send_post_request(payload)
+        response = self.__send_post_request(payload)
+        return self.__validate(response)
 
 
     def get_my_games(self, all=False):
-        params = 'type=' + 'myGames' if open else 'myOpenGames'
-        return self.__send_get_request(params)
+        params      = 'type=' + 'myGames' if open else 'myOpenGames'
+        response    = self.__send_get_request(params)
+        return self.__validate(response)
 
 
     def get_the_move_list(self, gameId, count=1):
-        params = f'type=moves&gameId={gameId}&count={count}'
-        return self.__send_get_request(params)
+        params      = f'type=moves&gameId={gameId}&count={count}'
+        response    = self.__send_get_request(params)
+        return self.__validate(response)
 
 
     def get_board_string(self, gameId):
-        params = f'type=boardString&gameId={gameId}'
-        return self.__send_get_request(params)
+        params      = f'type=boardString&gameId={gameId}'
+        response    = self.__send_get_request(params)
+        return self.__validate(response)
 
 
     def get_board_map(self, gameId):
-        params = f'type=boardMap&gameId={gameId}'
-        return self.__send_get_request(params)
+        params   = f'type=boardMap&gameId={gameId}'
+        response = self.__send_get_request(params)
+        return self.__validate(response)
 
-    def validate(self, response):
+    def __validate(self, response):
         try:
             if not response:
                 raise HTTPRequestFailureException
@@ -89,11 +97,11 @@ class Connection:
             if not data['code'] == 'OK':
                 raise APIFailureException
             
-            return True
+            return data
 
         except HTTPRequestFailureException:
             print(f'Request has failed with {response.status_code} status code.')
-            return False
+            return None
         except APIFailureException:
             print(f'Api returned {data["code"]} code with the below message\n{data["message"]}' if data["message"] else ".")
-            return False
+            return None
