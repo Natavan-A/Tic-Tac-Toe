@@ -3,6 +3,7 @@ from connection import Connection
 from game import Game
 from helpers import ALPHA_BETA_SEARCH
 
+my_id = 1255
 def make_a_move(connection, game, teamId, next_move):
     next_move_str = "{},{}".format(next_move[0],next_move[1])
     sign = game.get_my_sign()
@@ -14,7 +15,7 @@ def make_a_move(connection, game, teamId, next_move):
     else: print(data)
 
 def play_an_open_game(connection):
-    my_id = 1248
+    global my_id
     # RETRIEVE IDS OF OPEN GAMES
     myGames = connection.get_my_games().json()['myGames']
     print("MY OPEN GAMES: "+ str(len(myGames)))
@@ -58,7 +59,8 @@ def play_an_open_game(connection):
         playing(connection, game, ttt_board, winning_states)
 
 def play_an_open_game_with_id(connection, game_id, opponent_id):
-    my_id = 1248
+    global my_id
+
     my_sign = 'X'
 
     requestInfo = connection.get_board_string(game_id).json()
@@ -89,7 +91,8 @@ def play_an_open_game_with_id(connection, game_id, opponent_id):
 
 def create_and_play_a_game(connection, opponent_id, size, target):
     # CREATE YOUR OWN GAME
-    game = Game(connection, size, target, 1248, opponent_id, 'O')
+    global my_id
+    game = Game(connection, size, target, my_id, opponent_id, 'O')
     ttt_board = game.get_ttt_board()
     winning_states = ttt_board.get_winning_states()
     print(game.get_id())
@@ -127,8 +130,9 @@ def playing(connection, game, ttt_board, winning_states):
 
 def test_play(connection, opponent_id, size, target):
     # CREATE YOUR OWN GAME
+    global my_id
     sign = 'O'
-    game = Game(connection, size, target, 1248, opponent_id, sign)
+    game = Game(connection, size, target, my_id, opponent_id, sign)
     ttt_board = game.get_ttt_board()
     winning_states = ttt_board.get_winning_states()
     print(ttt_board.get_matrix())
@@ -174,8 +178,9 @@ if __name__ == "__main__":
     # print(connection.get_my_games().json()['myGames'])
     # print(connection.get_board_string("2750").json())
     ################ IMPORTANT COMMANDS ############
-    play_an_open_game_with_id(connection, 2750, 1244)
-    # create_and_play_a_game(connection, 1256, 12, 6)
+    # play_an_open_game_with_id(connection, 2750, 1244) -- Won
+    # create_and_play_a_game(connection, 1255, 3, 3)
+    play_an_open_game_with_id(connection, 2771, 1255)
     ################################################
 
     #isitend - teamId - 1248
