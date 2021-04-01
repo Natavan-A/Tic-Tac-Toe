@@ -65,8 +65,8 @@ class Connection:
         return self.__validate(response)
 
 
-    def get_my_games(self, all=False):
-        params      = 'type=' + 'myGames' if open else 'myOpenGames'
+    def get_my_games(self, open=False):
+        params      = 'type=' + 'myGames' if not open else 'myOpenGames'
         response    = self.__send_get_request(params)
         return self.__validate(response)
 

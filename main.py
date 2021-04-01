@@ -8,15 +8,18 @@ if __name__ == "__main__":
 
     game = Game(api_key='c9426ee5181dca77e9a2', user_id='1055')
     # 1256 1255
-    game.create(player=(1255, 'X'), opponent=(1256, 'O'), board_size=6, target=4)
-    # game.connect(game_id=1509)
 
-    winner = game.start()
-    # winner = game.testing()
+    # use in real gaming
+    # game.create( player={'id':1255, 'sign':'O'},  opponent={'id':1256, 'sign':'X'}, board_size=6, target=4)
+    # game.connect(player={'id':1255, 'sign':'X'}, opponent={'id':1256, 'sign':'O'}, game_id=2834)
+
+    # winner = game.start()
+    winner = game.testing(20, 10)
     
     print(f'Game ended at the round {game.get_board().get_round()}')
 
+
     if winner:
-        print(f'The winner is {winner}')
+        print(f'The winner is {winner.get_sign()}')
     else:
-        print('There is no winner. Game is tie!')    
+        print('There is no winner. Game is tie!')

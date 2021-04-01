@@ -1,25 +1,21 @@
+from functools import reduce
 from square import Square
 from helpers import *
 
-
 class Board:
-    def __init__(self, size, target, players):
+    def __init__(self, size, target):
         self.__size                 = size
         self.__moves                = []
         self.__round                = 0
-        self.__target               = target
-        self.__players              = players
-        self.__squares              = {(x, y): Square(x, y) for x in range(size) for y in range(size)}
-        # self.__scores_table         = self.__compute_scores()
         self.__winner               = None
-        self.__compute_terminals()
-
-        # FEEDBACK
+        self.__target               = target
+        self.__squares              = {(x, y): Square(x, y) for x in range(size) for y in range(size)}
+        
         print(f'Board sized {size} with target {target} is set.')
 
 
     # PRIVATE METHODS
-    def __compute_terminals(self):
+    def compute_terminals(self, player, opponent):
 
         size                = self.__size
         target              = self.__target
@@ -28,236 +24,118 @@ class Board:
         # number of terminal states: size - target + 1 and +1 for upperbound
         num_of_terminals    = size - target + 1
 
-        
-        def compute_terminal(kind, initial, target=6, closure=None):
-            x, y        = initial
-            terminals   = []
+        def set_to_squares(terminal):
+            terminal = [squares[position] for position in terminal]
+            for square in terminal: square.add_terminal(terminal)
 
-            if kind.__eq__('east_north'):
-                # vertical
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    x += 1
-                terminals.append(terminal)
 
-                # horizontal
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    y += 1
-                terminals.append(terminal)
+        for i in range(size):
+            for j in range(num_of_terminals):
+                terminal_vertical   = []
+                terminal_horizontal = []
+                for k in range(j, target + j):
+                    terminal_horizontal.append((i, k))
+                    terminal_vertical.append((k, i))
+                set_to_squares(terminal_horizontal)
+                set_to_squares(terminal_vertical)
 
-                # diagonal
-                x, y = initial
-                terminal = []
+
+        for i in range(num_of_terminals):
+            for j in range(num_of_terminals):
+                terminal_diagonal_left   = []
+                terminal_diagonal_right  = []
+                x, y = i, j
                 for _ in range(target):
-                    terminal.append((x, y))
+                    terminal_diagonal_left.append((x, y))
+                    terminal_diagonal_right.append((x, size - y - 1))
                     x += 1
                     y += 1
-                terminals.append(terminal)
-
-            if kind.__eq__('east_south'):
-                # vertical
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    x -= 1
-                terminals.append(terminal)
-
-                # horizontal
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    y += 1
-
-                # diagonal
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    x -= 1
-                    y += 1
-                terminals.append(terminal)
-
-            if kind.__eq__('west_north'):
-                # vertical
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    x += 1
-                terminals.append(terminal)
-
-                # horizontal
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    y -= 1
-                terminals.append(terminal)
-
-                # diagonal
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    x += 1
-                    y -= 1
-                terminals.append(terminal)
-
-
-            if kind.__eq__('west_south'):
-                # vertical
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    x -= 1
-                terminals.append(terminal)
-
-                # horizontal
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    y -= 1
-                terminals.append(terminal)
-
-                # diagonal
-                x, y = initial
-                terminal = []
-                for _ in range(target):
-                    terminal.append((x, y))
-                    x -= 1
-                    y -= 1
-                terminals.append(terminal)
-
-            if closure: closure(terminals)
-
-        def set_to_squares(terminals):
-            for terminal in terminals:
-                terminal = [squares[position] for position in terminal]
-                for square in terminal: square.add_terminal(terminal)
-
-
-        for x in range(num_of_terminals):
-            for y in range(num_of_terminals):
-                compute_terminal(kind='east_north', initial=(x, y), target=target, closure=set_to_squares)
-
-                compute_terminal(kind='west_north', initial=(x, size - y - 1), target=target, closure=set_to_squares)
+                set_to_squares(terminal_diagonal_left)
+                set_to_squares(terminal_diagonal_right)
                 
-                compute_terminal(kind='east_south', initial=(size - x - 1, y), target=target, closure=set_to_squares)
-
-                compute_terminal(kind='west_south', initial=(size - x - 1, size - y - 1), target=target, closure=set_to_squares)
-
-
+        self.__calculate_square_scores(player, opponent)
 
         print(f'Terminals calculated')
-        
+      
+
     # PUBLIC METHODS
-    def get_move(self, move):
-        return self.__squares[move]
-
-    def get_terminals(self):
-        return self.__terminals
-
-    def get_terminal_score(self, key):
-        key = sorted(key, key=lambda item: item if item else 0)
-        return self.__scores_table[str(key)]
+    def set_move(self, move, player):
+        move.set_assignee(player)
+        self.__moves.append(move)
     
     def record_round(self):
         self.__round = len(self.__moves)
 
+    def get_size(self):
+        return self.__size
+    
+    def get_target(self):
+        return self.__target
+    
+    def get_move(self, move):
+        return self.__squares[move]
+
     def get_round(self):
-        self.__round
+        return self.__round
 
     def get_moves(self):
         return self.__moves
 
     def get_latest_move(self):
         return self.__moves[-1]
-
-    def get_size(self):
-        return self.__size
-
-    def get_winner(self):
-        return self.__winner
     
-    def get_target(self):
-        return self.__target
-    
-    def get_empty_squares(self):
-        return list(set(self.__squares.values()).difference(set(self.__moves)))
-
-    def get_empty_squares_sorted(self):
-        return sorted(list(set(self.__squares.values()).difference(set(self.__moves))), key=lambda item: item.get_score(), reverse=True)
-        
-    def get_current_player(self):
-        return self.__players[0]
-
-    def get_next_player(self):
-        return self.__players[1]
-    
-    def set_players(self, players):
-        self.__players = players if players[0].get_sign().lower() == 'x' else players.reverse()
-
-    def set_square(self, move):
-        move.set_assignee(self.get_current_player())
-        self.__moves.append(move)
-        self.__update_empty_square_scores()
-        self.__players.reverse() # change players order
-
-    def undo(self):
-        self.__squares[self.__moves[-1].get_position()].set_assignee(None)
-        self.__moves.pop()
-        self.__update_empty_square_scores()
-        self.__players.reverse()
+    def get_empty_squares(self, sort=False, desc=False):
+        if sort:
+            lsort= sorted(list(filter(lambda x: x.is_empty(), self.__squares.values())), key=lambda x: x.get_score(), reverse=desc)
+            return lsort
+        return list(filter(lambda x: x.is_empty(), self.__squares.values()))
 
     def has_moves(self, enough=None):
         if enough:
             return len(self.__moves) >= self.__target
         return not len(self.__moves[self.__round:]) == 0
 
-    def has_winner(self):
-        if self.__winner:
-            return True
-        return False
-
     def is_full(self):
         return (self.__size ** 2) - len(self.__moves) == 0
 
     def is_terminal(self):
-        square          = self.__moves[-1] # lastest move
-        previous_player  = self.get_next_player() # next player is logically was previous one
-        win_state       = [previous_player] * self.__target
-        
-        if self.is_full(): return True
-        
-        for terminal in square.get_terminals():
-            if win_state == [square.get_assignee() for square in terminal]:
-                self.__winner = previous_player
-                return True
+        for terminal in self.get_latest_move().get_terminals(): 
+            terminal = [square.get_assignee() for square in terminal]
+            if len(list(filter(lambda a: not a == terminal[0], terminal))) == 0:
+                    return True
         return False
+ 
+    def undo(self, move):
+        move.reset()
+        self.__moves.pop()
 
-    def __update_empty_square_scores(self):
-        empty_squares   = self.get_empty_squares()
+    def update_terminals(self, player, opponent):
+        for square in self.get_empty_squares():
+            terminals = square.get_terminals()
+            for index, terminal in enumerate(terminals):
+                cplayer, copponent =  [0] * 2
+                for cell in terminal:
+                    if cell.get_assignee() is player: 
+                        cplayer += 1
+                    elif cell.get_assignee() is opponent: 
+                        copponent += 1
+                    if cplayer and copponent: break
+                if cplayer and copponent: del terminals[index]
         
-        for square in empty_squares:
-            for terminal in [[square.get_assignee() for square in terminal] for terminal in square.get_terminals()]:
-                u_terminal = set(terminal)
-                if any(u_terminal):
-                    if len(u_terminal) == 3: square.update_score(-100)
-                    else:
-                        player = u_terminal.__iter__().__next__()
-                        count  = len(list(filter(lambda item: item is player, terminal)))
-                        square.update_score(10**count)
-                else:
-                    square.update_score(1)
+        self.__calculate_square_scores(player, opponent)
+
+    def __calculate_square_scores(self, player, opponent):
+        for square in self.get_empty_squares():
+            square.clear_score()
+            terminals = square.get_terminals()
+            for terminal in terminals:
+                score = 0
+                for cell in terminal:
+                    if cell.is_empty(): score += 1
+                    elif cell.get_assignee() is player: score += 11
+                    else: score += 10 
+                        
+                square.add_score(score) 
 
     def sketch_board(self):
         board = self.__squares

@@ -4,13 +4,13 @@ class Square:
         self.__y = y
         self.__terminals = []
         self.__assignee  = None
-        self.__score     = 1
+        self.__score     = 0
 
     def add_terminal(self, terminal):
         self.__terminals.append(terminal)
     
-    def update_score(self, score):
-        self.__score += score * len(self.__terminals)
+    def add_score(self, score):
+        self.__score += score
 
     def set_assignee(self, player):
         self.__assignee = player
@@ -32,6 +32,13 @@ class Square:
 
     def get_position(self):
         return (self.__x, self.__y)
- 
+
+    def clear_score(self):
+        self.__score = 0
+    
+    def reset(self):
+        self.__assignee = None
+        self.__score    = 0
+        
     def is_empty(self):
         return self.__assignee == None
