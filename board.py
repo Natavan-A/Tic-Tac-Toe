@@ -10,12 +10,12 @@ class Board:
         self.__winner               = None
         self.__target               = target
         self.__squares              = {(x, y): Square(x, y) for x in range(size) for y in range(size)}
-        
+        self.__compute_terminals()
         print(f'Board sized {size} with target {target} is set.')
 
 
     # PRIVATE METHODS
-    def compute_terminals(self, player, opponent):
+    def __compute_terminals(self):
 
         size                = self.__size
         target              = self.__target
@@ -52,8 +52,6 @@ class Board:
                     y += 1
                 set_to_squares(terminal_diagonal_left)
                 set_to_squares(terminal_diagonal_right)
-                
-        self.__calculate_square_scores(player, opponent)
 
         print(f'Terminals calculated')
       
@@ -129,17 +127,44 @@ class Board:
             square.clear_score()
             terminals = square.get_terminals()
             for terminal in terminals:
-                score = 0
-                for cell in terminal:
-                    if cell.is_empty(): score += 1
-                    elif cell.get_assignee() is player: score += 11
-                    else: score += 10 
-                        
+                score    = 0
+                count    = 0
+                cfilled  = 0
+                assignee = None
+                # for cell in terminal:                
+                #     if cell.is_empty():
+                #         if count:
+                #             if assignee is player:
+                #                 score += (10.1 ** count)
+                #             elif assignee is opponent:
+                #                 score += (10 ** count)
+                #             count = 0
+                #     else:
+                #         assignee = cell.get_assignee()
+                #         count += 1
+                # score += 1 * len(terminal) - cfilled
+                # square.add_score(score) 
+                for cell in terminal:                
+                    if cell.is_empty(): count += 1
+                    else: assignee = cell.get_assignee()
+                score += count
+                diff = len(terminal) - count
+                if diff: score += 11 ** diff if assignee is player else 10 ** diff
                 square.add_score(score) 
-
+                
     def sketch_board(self):
+        board   = self.__squares
+        cnames  = [f'{i%10}' for i in range(self.__size)]
+        print('  ' + '|'.join(cnames) + '|')
+        for i in range(self.__size):
+            print(f'{i%10}|', end='')
+            for j in range(self.__size):
+                print(f'{board[(i,j)].get_assignee().get_sign() if board[(i,j)].get_assignee() else "."}|', end='')
+            print()
+
+    def sketch_board_scores(self):
         board = self.__squares
         for i in range(self.__size):
             for j in range(self.__size):
-                print(f'{board[(i,j)].get_assignee().get_sign() if board[(i,j)].get_assignee() else "."}|', end='')
+                print(f'{board[(i,j)].get_score()}|', end='')
             print()
