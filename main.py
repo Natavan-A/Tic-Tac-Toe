@@ -10,14 +10,14 @@ if __name__ == "__main__":
     # 1256 1255
 
     # use in real gaming
-    # game.create(player={'id':1248, 'sign':'O'},  opponent={'id':1250, 'sign':'X'}, board_size=12, target=6)
-    game.connect(player={'id':1248, 'sign':'X'}, opponent={'id':1250, 'sign':'O'}, game_id=3046)
+    # game.create(player={'id':1248, 'sign':'O'},  opponent={'id':1251, 'sign':'X'}, board_size=6, target=4)
+    game.connect(player={'id':1248, 'sign':'X'}, opponent={'id':1255, 'sign':'O'}, game_id=3087)
 
     winner = game.start()
     # winner = game.testing(20, 10)
+
     
     print(f'Game ended at the round {game.get_board().get_round()}')
-
 
     if winner:
         print(f'The winner is {winner.get_sign()}')

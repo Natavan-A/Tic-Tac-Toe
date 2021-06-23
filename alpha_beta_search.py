@@ -26,6 +26,7 @@ class AlphaBetaSearch:
         for move in self.state.get_empty_squares(sort=True, desc=True)[:1]:
 
             self.state.set_move(move, player)
+
             self.state.update_terminals(player, opponent)
 
             previous_best_score, best_score = best_score, max(best_score, self.__min_value(depth - 1, *self.__switch_players(player, opponent), alpha, beta))
@@ -50,6 +51,7 @@ class AlphaBetaSearch:
         for move in self.state.get_empty_squares(sort=True, desc=True)[:1]:
             
             self.state.set_move(move, player)
+            
             self.state.update_terminals(player, opponent)
 
             previous_worst_score, worst_score = worst_score, min(worst_score, self.__max_value(depth - 1, *self.__switch_players(player, opponent), alpha, beta))
